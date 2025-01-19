@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属拜年图像</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: 500;
+            color: #787878;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            margin-left: 30px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #787878;
+        }
+
+        /* 主容器样式 */
+        .main-container {
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.4em;
+            font-weight: 300;
+            color: #222;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.4em;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        /* 按钮组样式 */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background-color: white;
+            color: #787878;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-1px);
+        }
+
+        .btn.active {
+            background-color: #787878;
+            color: white;
+            border-color: #787878;
+        }
+
+        /* 上传区域样式 */
+        .upload-area {
+            height: 450px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #999;
+            background-color: #f8f8f8;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* 图片预览样式 */
+        .preview-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        /* 风格选择区域 */
+        .style-options {
+            display: flex;
+            justify-content: space-between; /* 使选项均匀分布 */
+            padding: 0 20px; /* 添加左右内边距 */
+        }
+
+        .style-option {
+            position: relative;
+            cursor: pointer;
+            border-radius: 10px; /* 卡片的圆角 */
+            overflow: hidden;
+            width: 300px; /* 增加宽度 */
+            height: 533px; /* 设置高度以符合9:16的比例 */
+            border: 2px solid transparent; /* 默认边框 */
+            transition: transform 0.3s, border-color 0.3s; /* 添加变换效果 */
+        }
+
+        .style-option:hover {
+            border-color: red; /* 悬停时边框颜色 */
+            transform: scale(1.05); /* 悬停时放大效果 */
+        }
+
+        .style-option.selected {
+            border-image: linear-gradient(to right, gold, red) 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .style-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保持图片比例 */
+        }
+
+        /* 页脚样式 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            margin-top: 40px;
+        }
+
+        /* 添加步骤导航样式 */
+        .steps-nav {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin: 0 20px;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .step-item.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #787878;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        /* 步骤内容区域样式 */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 导航按钮样式 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .prev-btn {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, #ff4d4d, #f6644e);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(246, 100, 78, 0.3);
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(246, 100, 78, 0.4);
+        }
+
+        .next-btn:active {
+            transform: translateY(1px);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 上传和风格选择的布局容器 */
+        .upload-style-container {
+            display: grid;
+            grid-template-columns: 2fr 3fr;
+            gap: 30px;
+            min-height: 500px;
+        }
+
+        /* 风格选择区域布局 */
+        .style-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .style-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+
+        /* 风格选项卡片样式 */
+        .style-option {
+            position: relative;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #eee;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 图片容器 */
+        .style-image-container {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            aspect-ratio: 9/16;
+            overflow: hidden;
+        }
+
+        /* 图片样式 */
+        .style-preview {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        /* 标签样式 */
+        .style-option label {
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+            background: white;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        /* 上传区域样式调整 */
+        .upload-section {
+            height: 100%;
+        }
+
+        .upload-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 预览图样式 */
+        .preview-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .style-option {
+                height: 400px;
+            }
+            
+            .upload-area {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .upload-style-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .style-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .style-option {
+                height: 350px;
+            }
+            
+            .upload-area {
+                height: 350px;
+            }
+        }
+
+        /* 添加选中效果 */
+        .style-option.selected {
+            border-color: #787878;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 添加悬浮效果 */
+        .style-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        /* 优化图片显示 */
+        .style-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 选中和悬浮效果 */
+        .style-option:hover {
+            border-color: #ddd;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .style-option.selected {
+            border-image: linear-gradient(to right, gold, red) 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .style-option.selected .style-preview {
+            transform: scale(1.02);
+        }
+
+        /* 性别选择区域样式 */
+        .gender-options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .gender-option {
+            position: relative;
+            width: 300px;
+            height: 450px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #eee;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gender-image-container {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            aspect-ratio: 9/16;
+            overflow: hidden;
+        }
+
+        .gender-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .gender-option label {
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+            background: white;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        /* 新年背景动画 */
+        @keyframes fall {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); } /* 向下移动到视口底部 */
+        }
+
+        .floating-item {
+
+            position: absolute;
+            animation: fall 5s linear infinite; /* 调整动画持续时间 */
+            font-size: 2em; /* 调整 emoji 大小 */
+            opacity: 0.8;
+        }
+
+        .red-envelope {
+            left: 10%;
+            top: -10%; /* 从视口顶部开始 */
+            animation-delay: 0s;
+        }
+
+        .gold-coin {
+            left: 30%;
+            top: -20%; /* 从视口顶部开始 */
+            animation-delay: 1s;
+        }
+
+        .red-envelope-2 {
+            left: 50%;
+            top: -15%; /* 从视口顶部开始 */
+            animation-delay: 2s;
+        }
+
+        .gold-coin-2 {
+            left: 70%;
+            top: -25%; /* 从视口顶部开始 */
+            animation-delay: 1.5s;
+        }
+
+        .red-envelope-3 {
+            left: 80%;
+            top: -5%; /* 从视口顶部开始 */
+            animation-delay: 0.5s;
+        }
+
+        /* 增加更多的漂浮元素 */
+        .red-envelope-4 {
+            left: 20%;
+            top: -30%;
+            animation-delay: 1.2s;
+        }
+
+        .gold-coin-3 {
+            left: 40%;
+            top: -35%;
+            animation-delay: 1.8s;
+        }
+
+        .red-envelope-5 {
+            left: 60%;
+            top: -40%;
+            animation-delay: 0.3s;
+        }
+
+        /* 背景选项样式 */
+        .background-options {
+            display: flex;
+            justify-content: space-between; /* 使选项均匀分布 */
+            margin-top: 0; /* 设置为0 */
+            padding: 0 20px; /* 添加左右内边距 */
+        }
+
+        .background-option {
+            position: relative;
+            margin: 0 8px; /* 每个框之间的距离为16px */
+            cursor: pointer;
+            border-radius: 10px; /* 卡片的圆角 */
+            overflow: hidden;
+            width: 200px; /* 增加宽度 */
+            height: 100px; /* 固定高度 */
+            border: 2px solid transparent; /* 默认边框 */
+            transition: transform 0.3s, border-color 0.3s; /* 添加变换效果 */
+        }
+
+        .background-option:hover {
+            border-color: red; /* 悬停时边框颜色 */
+            transform: scale(1.05); /* 悬停时放大效果 */
+        }
+
+        .background-option.selected {
+            border-color: #333 /* 选中时的边框颜色 */
+        }
+
+        .background-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保持图片比例 */
+        }
+
+        .background-label {
+            position: absolute;
+            bottom: 5px; /* 调整文字位置 */
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white; /* 文字颜色 */
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* 文字阴影 */
+        }
+
+        .result-container {
+            position: relative;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .result-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1; /* 背景在后面 */
+            opacity: 0.5; /* 背景透明度 */
+        }
+
+        /* 设置 style-section 的 margin-bottom 为 0 */
+        .style-section {
+            margin-bottom: 0; /* 设置为0 */
+        }
+
+        .image-preview-container {
+            display: flex;
+            justify-content: space-between; /* 使选项均匀分布 */
+            margin-top: 20px; /* 与上传图片的距离 */
+        }
+
+        .image-preview {
+            width: 100px; /* 预览图宽度 */
+            height: 100px; /* 预览图高度 */
+            border: 2px dashed #ccc; /* 虚线边框 */
+            border-radius: 10px; /* 圆角 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa; /* 提示文字颜色 */
+            margin-right: 4px; /* 右侧留4px距离 */
+        }
+
+        .image-preview:last-child {
+            margin-right: 0; /* 最后一个元素不留右侧距离 */
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px; /* 圆角 */
+        }
+
+        .upload-instruction {
+            margin-top: 30px; /* 提示文字与上传图片区域的距离 */
+            text-align: left; /* 居中对齐 */
+            color: #aaa; /* 改为浅灰色 */
+            font-weight: normal; /* 去掉加粗 */
+        }
+
+        .image-example-container {
+            display: flex;
+            justify-content: space-between; /* 使选项均匀分布 */
+            margin-top: 20px; /* 与上传图片的距离 */
+        }
+
+        .image-example {
+            width: 100px; /* 占位图宽度 */
+            height: 100px; /* 占位图高度 */
+            border: 2px dashed #ccc; /* 虚线边框 */
+            border-radius: 10px; /* 圆角 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa; /* 提示文字颜色 */
+        }
+
+        .background-option.masked {
+            position: relative;
+        }
+
+        .background-option.masked::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5); /* 黑色透明度 */
+            border-radius: 10px; /* 与卡片圆角一致 */
+        }
+
+        .result-container {
+            width: 100%;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f8f8;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff4d4f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .result-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .result-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-logo">专属拜年图像</a>
+            <div class="nav-links">
+                <a href="#">首页</a>
+                <a href="#">关于我们</a>
+                <a href="#">联系我们</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区 -->
+    <div class="main-container">
+        <h1>创建您的专属拜年图像</h1>
+
+        <!-- 步骤导航 -->
+        <div class="steps-nav">
+            <div class="step-item active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">上传照片</div>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">生成结果</div>
+            </div>
+        </div>
+
+        <!-- 步骤1：上传照片和选择风格 -->
+        <div class="step-content active" data-step="1">
+            <div class="upload-style-container">
+                <!-- 左侧上传区域 -->
+                <div class="section upload-section">
+                    <h2>上传照片</h2>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="upload-text">点击或拖拽照片到这里</p>
+                        </div>
+                        <img id="previewImage" class="preview-image" style="display: none;">
+                        <input type="file" id="fileInput" accept="image/*" style="display: none" onchange="handleFileUpload(event)">
+                    </div>
+
+                    <!-- 图片示例模块 -->
+                    <div class="upload-instruction">请参考以下标准上传图片</div>
+                    <div class="image-preview-container">
+                        <div class="image-preview" id="preview1">
+                            <img src="assets/pic/yes.png" alt="预览1" style="max-width: 100%; max-height: 100%; border-radius: 10px;">
+                            <span style="position: absolute; top: 5px; right: 5px; font-size: 24px;">✅</span>
+                        </div>
+                        <div class="image-preview" id="preview2">
+                            <img src="assets/pic/img2.png" alt="预览2" style="max-width: 100%; max-height: 100%; border-radius: 10px;">
+                            <span style="position: absolute; top: 5px; right: 5px; font-size: 24px;">❌</span>
+                        </div>
+                        <div class="image-preview" id="preview3">
+                            <img src="assets/pic/img3.png" alt="预览3" style="max-width: 100%; max-height: 100%; border-radius: 10px;">
+                            <span style="position: absolute; top: 5px; right: 5px; font-size: 24px;">❌</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧风格选择区域 -->
+                <div class="section style-section">
+                    <h2>选择风格</h2>
+                    <div class="style-options">
+                        <div class="style-option" onclick="selectStyle('anime', this)">
+                            <div class="style-image-container">
+                                <img src="assets/images/styles/animate.png" 
+                                     alt="二次元风格" 
+                                     class="style-preview">
+                            </div>
+                            <label>二次元风格</label>
+                            <input type="radio" name="style" value="anime" style="display: none">
+                        </div>
+                        <div class="style-option" onclick="selectStyle('photo', this)">
+                            <div class="style-image-container">
+                                <img src="assets/images/styles/real.png" 
+                                     alt="写真风格" 
+                                     class="style-preview">
+                            </div>
+                            <label>写真版风格</label>
+                            <input type="radio" name="style" value="photo" style="display: none">
+                        </div>
+                    </div>
+
+                    <!-- 背景选项区域 -->
+                    <h2 style="margin-top: 32px;">选择背景</h2>
+                    <div class="background-options">
+                        <div class="background-option" onclick="selectBackground('golden-snake.jpg', this)">
+                            <img src="assets/backgrounds/golden-snake.jpg" alt="金蛇贺岁">
+                            <div class="background-label">金蛇贺岁</div>
+                        </div>
+                        <div class="background-option" onclick="selectBackground('fan-hongyun.jpg', this)">
+                            <img src="assets/backgrounds/fan-hongyun.jpg" alt="扇展鸿运">
+                            <div class="background-label">扇展鸿运</div>
+                        </div>
+                        <div class="background-option" onclick="selectBackground('food-wealth.jpg', this)">
+                            <img src="assets/backgrounds/food-wealth.jpg" alt="食丰财盛">
+                            <div class="background-label">食丰财盛</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn next-btn" onclick="nextStep(1)">
+                    <span>生成图像</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 步骤2：生成结果 -->
+        <div class="step-content" data-step="2">
+            <div class="section">
+                <h2>您的专属拜年图像</h2>
+                <div class="result-container">
+                    <div class="loading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">正在为您生成专属拜年图像，排队中请稍候...</div>
+                    </div>
+                    <div class="result-wrapper" style="display: none;">
+                        <img src="" alt="生成结果" class="result-image">
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="nav-btn prev-btn" onclick="prevStep(2)">返回修改</button>
+                    <button class="nav-btn next-btn" onclick="downloadResult()">保存图像</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>© 2024 专属拜年图像. 保留所有权利</p>
+    </footer>
+
+    <!-- 添加漂浮的红包和金币 emoji -->
+    <div class="floating-item red-envelope">🧧</div>
+    <div class="floating-item gold-coin">💰</div>
+    <div class="floating-item red-envelope red-envelope-2">🧧</div>
+    <div class="floating-item gold-coin gold-coin-2">💰</div>
+    <div class="floating-item red-envelope red-envelope-3">🧧</div>
+    <div class="floating-item red-envelope red-envelope-4">🧧</div>
+    <div class="floating-item gold-coin gold-coin-3">💰</div>
+    <div class="floating-item red-envelope red-envelope-5">🧧</div>
+
+    <script>
+        let currentStep = 1;
+        let selectedGender = null;
+        let uploadedImage = null;
+        let selectedStyle = null;
+        let selectedBackground = null;
+
+        // 更新步骤显示
+        function updateSteps(step) {
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.classList.remove('active');
+                if (parseInt(item.dataset.step) <= step) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+                if (parseInt(content.dataset.step) === step) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        // 定义工作流映射对象
+        const workflowMap = {
+            'anime': {  // 二次元风格
+                'fan-hongyun.jpg': 'shanzi_gif_api.json',  // 扇展鸿运背景
+                'golden-snake.jpg': 'snake_anime_api.json', // 金蛇贺岁背景
+                'food-wealth.jpg': 'food_anime_api.json'    // 食丰财盛背景
+            },
+            'photo': {  // 写真风格
+                'fan-hongyun.jpg': 'fan_photo_api.json',   
+                'golden-snake.jpg': 'snake_photo_api.json',
+                'food-wealth.jpg': 'food_photo_api.json'
+            }
+        };
+
+        // 选择风格
+        function selectStyle(style, element) {
+            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedStyle = style;
+            
+            // 添加选中效果的动画
+            const img = element.querySelector('.style-preview');
+            img.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                img.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // 选择背景
+        function selectBackground(background, element) {
+            document.querySelectorAll('.background-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.style.borderColor = 'transparent';
+            });
+            
+            element.classList.add('selected');
+            element.style.borderColor = 'gold';
+            selectedBackground = background;
+        }
+
+        // 生成图像
+        async function generateImage() {
+            if (!selectedStyle || !selectedBackground || !uploadedImage) {
+                alert('请选择风格和背景并上传图片');
+                return;
+            }
+
+            try {
+                // 显示加载状态
+                const loadingElement = document.querySelector('.loading');
+                const resultWrapper = document.querySelector('.result-wrapper');
+                loadingElement.style.display = 'flex';
+                resultWrapper.style.display = 'none';
+
+                // 禁用按钮
+                const prevBtn = document.querySelector('.prev-btn');
+                const nextBtn = document.querySelector('.next-btn');
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+
+                // 更新步骤
+                currentStep = 2;
+                updateSteps(currentStep);
+
+                // 获取对应的工作流
+                const workflow = workflowMap[selectedStyle][selectedBackground];
+                
+                // 创建 FormData 对象
+                const formData = new FormData();
+                formData.append('image', uploadedImage);
+                formData.append('workflow', workflow);
+
+                // 调用后端 API
+                const response = await fetch('http://localhost:3003/api/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const data = await response.json();
+                
+                // 显示结果
+                const resultImage = document.querySelector('.result-image');
+                resultImage.src = data.output_url;
+                
+                // 隐藏加载状态，显示结果
+                loadingElement.style.display = 'none';
+                resultWrapper.style.display = 'flex';
+
+                // 启用按钮
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+
+            } catch (error) {
+                console.error('生成失败:', error);
+                const loadingElement = document.querySelector('.loading');
+                loadingElement.style.display = 'none';
+                
+                // 启用按钮
+                const prevBtn = document.querySelector('.prev-btn');
+                const nextBtn = document.querySelector('.next-btn');
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+                
+                alert('生成失败，请重试: ' + error.message);
+            }
+        }
+
+        // 修改 nextStep 函数
+        async function nextStep(step) {
+            if (step === 1) {
+                if (!uploadedImage) {
+                    alert('请上传照片');
+                    return;
+                }
+                if (!selectedStyle) {
+                    alert('请选择风格');
+                    return;
+                }
+                if (!selectedBackground) {
+                    alert('请选择背景');
+                    return;
+                }
+
+                try {
+                    await generateImage();
+                } catch (error) {
+                    console.error('生成失败:', error);
+                    alert('生成失败，请重试');
+                    return;
+                }
+            }
+        }
+
+        // 修改 prevStep 函数
+        function prevStep(currentStep) {
+            currentStep--;
+            updateSteps(currentStep);
+            
+            // 修改按钮文字
+            const nextBtn = document.querySelector('.step-content[data-step="1"] .next-btn span');
+            if (nextBtn) {
+                nextBtn.textContent = '再次生成';
+            }
+        }
+
+        // 选择性别
+        function selectGender(gender, element) {
+            // 移除所有选项的selected类
+            document.querySelectorAll('.gender-option').forEach(opt => opt.classList.remove('selected'));
+            // 添加selected类到选中的选项
+            element.classList.add('selected');
+            // 选中对应的radio
+            element.querySelector('input[type="radio"]').checked = true;
+            selectedGender = gender;
+            
+            // 添加选中效果的动画
+            const img = element.querySelector('.gender-preview');
+            img.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                img.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('图片大小不能超过10MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImage = document.getElementById('previewImage');
+                    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+                    
+                    uploadPlaceholder.style.display = 'none';
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    
+                    // 保存文件对象而不是base64
+                    uploadedImage = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 其他函数...
+        function selectBackground(background, element) {
+            // 移除所有选项的selected类和蒙版
+            document.querySelectorAll('.background-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.classList.remove('masked'); // 移除蒙版
+                opt.style.borderColor = 'transparent'; // 重置边框颜色
+            });
+            
+            // 添加selected类到选中的选项
+            element.classList.add('selected');
+            element.style.borderColor = 'gold'; // 设置选中时的边框颜色
+
+            // 给未选中的选项添加蒙版
+            document.querySelectorAll('.background-option').forEach(opt => {
+                if (!opt.classList.contains('selected')) {
+                    opt.classList.add('masked'); // 添加蒙版
+                }
+            });
+
+            // 更新选中的背景
+            selectedBackground = background; // 设置选中的背景
+        }
+
+        async function callWorkflowApi(workflow) {
+            if (workflow === 'fan_anime') {
+                const resultContainer = document.querySelector('.result-container');
+                const loadingElement = resultContainer.querySelector('.loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                }
+
+                try {
+                    console.log('开始连接服务器...');
+                    
+                    // 修改服务器地址配置
+                    const serverUrl = 'http://localhost:3003/api';  // 改为3003
+
+                    console.log('准备上传图片...');
+                    const formData = new FormData();
+                    
+                    // 从 base64 创建 Blob
+                    const base64Data = uploadedImage.split(',')[1];
+                    const byteCharacters = atob(base64Data);
+                    const byteArrays = [];
+                    
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                            byteNumbers[i] = slice.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        byteArrays.push(byteArray);
+                    }
+                    
+                    const blob = new Blob(byteArrays, { type: 'image/jpeg' });
+                    formData.append('image', blob, 'input.jpg');
+
+                    console.log('开始上传图片...');
+                    const uploadResponse = await fetch(`${serverUrl}/upload/image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        const errorText = await uploadResponse.text();
+                        console.error('图片上传失败:', errorText);
+                        throw new Error(`图片上传失败: ${errorText}`);
+                    }
+
+                    const uploadResult = await uploadResponse.json();
+                    console.log('图片上传成功:', uploadResult);
+
+                    // 发送工作流请求
+                    console.log('发送工作流请求...');
+                    const response = await fetch(`${serverUrl}/queue`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            prompt: {
+                                "10": {
+                                    "inputs": {
+                                        "ckpt_name": "sdxl-动漫二次元_2.0.safetensors"
+                                    },
+                                    "class_type": "CheckpointLoaderSimple"
+                                },
+                                "11": {
+                                    "inputs": {
+                                        "image": "input.jpg",
+                                        "upload": "image"
+                                    },
+                                    "class_type": "LoadImage"
+                                },
+                                "12": {
+                                    "inputs": {
+                                        "text": "no human,Many fans，festive atmosphere, flat design style, red background, red background with golden decoration , high quality",
+                                        "clip": ["10", 1]
+                                    },
+                                    "class_type": "CLIPTextEncode"
+                                },
+                                "13": {
+                                    "inputs": {
+                                        "text": "hand,normal quality,bad quality, worse quality,ugly,signature, photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting",
+                                        "clip": ["10", 1]
+                                    },
+                                    "class_type": "CLIPTextEncode"
+                                },
+                                "94": {
+                                    "inputs": {
+                                        "filename_prefix": "ComfyUI",
+                                        "images": ["78", 0]
+                                    },
+                                    "class_type": "SaveImage"
+                                }
+                            },
+                            client_id: `test_${Date.now()}`
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('工作流提交失败:', errorText);
+                        throw new Error(`工作流提交失败: ${errorText}`);
+                    }
+
+                    const responseText = await response.text();
+                    console.log('服务器原始响应:', responseText);
+
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                        console.log('工作流提交结果:', result);
+                    } catch (error) {
+                        console.error('解析响应JSON失败:', error);
+                        throw new Error('无法解析服务器响应');
+                    }
+
+                    if (!result || !result.prompt_id) {
+                        throw new Error('服务器返回的数据格式不正确');
+                    }
+
+                    // 修改轮询参数
+                    let attempts = 0;
+                    const maxAttempts = 60;  // 增加到 60 次
+                    const pollInterval = 5000;  // 增加到 5 秒
+
+                    const checkResult = async () => {
+                        if (attempts >= maxAttempts) {
+                            throw new Error('生成超时，请重试');
+                        }
+
+                        try {
+                            console.log(`第 ${attempts + 1}/${maxAttempts} 次检查结果...`);
+                            
+                            const historyResponse = await fetch(`${serverUrl}/history/${result.prompt_id}`);
+                            const history = await historyResponse.json();
+                            
+                            console.log('获取到的历史记录:', history);
+
+                            // 如果有错误，立即抛出
+                            if (history.error) {
+                                throw new Error(`生成出错: ${history.error.message || '未知错误'}`);
+                            }
+
+                            // 如果工作流已完成且有输出
+                            if (!history.executing && history.outputs && history.outputs.images) {
+                                console.log('工作流完成，获取图片...');
+                                const filename = history.outputs.images[0].filename;
+                                const imageResponse = await fetch(`${serverUrl}/view?filename=${filename}`);
+                                
+                                if (imageResponse.ok) {
+                                    const imageBlob = await imageResponse.blob();
+                                    const imageUrl = URL.createObjectURL(imageBlob);
+                                    displayGeneratedResult({ image: imageUrl });
+                                    return;  // 成功后直接返回，不再继续轮询
+                                } else {
+                                    throw new Error('获取生成的图片失败');
+                                }
+                            }
+
+                            // 如果还在执行或没有输出，继续轮询
+                            console.log('工作流还在执行，继续等待...');
+                            attempts++;
+                            await new Promise(resolve => setTimeout(resolve, pollInterval));
+                            return checkResult();
+
+                        } catch (error) {
+                            console.error('检查结果出错:', error);
+                            attempts++;
+                            if (attempts < maxAttempts) {
+                                await new Promise(resolve => setTimeout(resolve, pollInterval));
+                                return checkResult();
+                            }
+                            throw error;
+                        }
+                    };
+
+                    // 在开始检查之前添加较短的延迟
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // 等待 2 秒后开始检查
+                    console.log('开始检查生成结果...');
+                    await checkResult();
+
+                } catch (error) {
+                    console.error('API调用详细错误:', error);
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
+                    alert(`生成失败: ${error.message}\n请确保服务器正在运行`);
+                    throw error;
+                }
+            }
+        }
+
+        // 更新显示结果的函数
+        function displayGeneratedResult(result) {
+            const resultContainer = document.querySelector('.result-container');
+            const loadingElement = resultContainer.querySelector('.loading');
+            const resultImage = resultContainer.querySelector('.result-image');
+
+            // 隐藏加载提示
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+
+            // 显示结果图片
+            if (resultImage && result.image) {
+                resultImage.src = result.image;
+                resultImage.style.display = 'block';
+            } else {
+                console.error('未能获取到生成结果');
+            }
+        }
+
+        // 添加 WebSocket 连接
+        const ws = new WebSocket('ws://localhost:3002');
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log('收到 WebSocket 消息:', message);
+            
+            // 处理不同类型的消息
+            if (message.type === 'execution_start') {
+                console.log('开始执行工作流');
+            } else if (message.type === 'execution_cached') {
+                console.log('使用缓存结果');
+            } else if (message.type === 'executing') {
+                console.log('正在执行节点:', message.data.node);
+            } else if (message.type === 'progress') {
+                console.log('进度:', message.data.value);
+            } else if (message.type === 'executed') {
+                console.log('节点执行完成:', message.data.node);
+                if (message.data.output && message.data.output.images) {
+                    const imageUrl = `http://localhost:3001/api/view?filename=${message.data.output.images[0].filename}`;
+                    displayGeneratedResult({ image: imageUrl });
+                }
+            }
+        };
+
+        // 修改下载函数
+        async function downloadResult() {
+            const resultImage = document.querySelector('.result-image');
+            if (!resultImage.src) {
+                alert('请先生成图像');
+                return;
+            }
+
+            try {
+                console.log('开始下载文件...');
+                
+                // 显示下载中的状态
+                const downloadBtn = document.querySelector('.next-btn');
+                const originalText = downloadBtn.textContent;
+                downloadBtn.textContent = '下载中...';
+                downloadBtn.disabled = true;
+
+                // 使用服务器作为代理来下载文件
+                const response = await fetch(`http://localhost:3003/api/download?url=${encodeURIComponent(resultImage.src)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/octet-stream'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+                }
+
+                // 获取文件内容
+                const blob = await response.blob();
+                
+                // 从响应头获取文件名
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = '专属拜年图像.png';
+                if (contentDisposition) {
+                    const matches = contentDisposition.match(/filename\*=UTF-8''(.+)/i);
+                    if (matches && matches[1]) {
+                        filename = decodeURIComponent(matches[1]);
+                    }
+                }
+                
+                console.log('创建下载链接...');
+                
+                // 创建下载链接
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                
+                // 触发下载
+                document.body.appendChild(link);
+                link.click();
+                
+                // 清理
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                console.log('下载完成');
+
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败，请重试: ' + error.message);
+            } finally {
+                // 恢复按钮状态
+                const downloadBtn = document.querySelector('.next-btn');
+                downloadBtn.textContent = '保存图像';
+                downloadBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

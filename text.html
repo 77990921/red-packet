@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拜年图像生成器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #e60012;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .preview {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+        .description {
+            background-color: #fff3f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e60012;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>拜年图像生成器</h1>
+        <div class="description">
+            <h3>使用说明：</h3>
+            <p>1. 上传一张您喜欢的参考图片</p>
+            <p>2. 点击"生成图像"按钮</p>
+            <p>3. 等待处理完成</p>
+            <p>4. 下载生成的图像</p>
+        </div>
+        <div class="form-group">
+            <label for="styleImage">上传参考图片：</label>
+            <input type="file" id="styleImage" accept="image/*">
+            <div id="stylePreview"></div>
+        </div>
+        <button onclick="generateGif()" id="generateBtn">生成图像</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // 预览上传的图片
+        function previewImage(input, previewDiv) {
+            const file = input.files[0];
+            if (file) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('图片大小不能超过10MB');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview';
+                    previewDiv.innerHTML = '';
+                    previewDiv.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('styleImage').addEventListener('change', function() {
+            previewImage(this, document.getElementById('stylePreview'));
+        });
+
+        async function generateGif() {
+            const styleImage = document.getElementById('styleImage').files[0];
+            const generateBtn = document.getElementById('generateBtn');
+            const result = document.getElementById('result');
+            
+            if (!styleImage) {
+                alert('请上传参考图片');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            result.innerHTML = '正在处理中...';
+
+            try {
+                const formData = new FormData();
+                formData.append('image', styleImage);
+
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('生成失败');
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // 显示结果
+                result.innerHTML = `<img src="${data.output_url}" class="preview">
+                                  <a href="${data.output_url}" download="拜年图像.png" class="button">下载图像</a>`;
+
+            } catch (error) {
+                result.innerHTML = `生成失败: ${error.message}`;
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html> 

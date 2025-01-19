@@ -1,0 +1,830 @@
+{
+  "4": {
+    "inputs": {
+      "ckpt_name": "sdxl-动漫二次元_2.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "11": {
+    "inputs": {
+      "text": "no human,no text，A golden snake，niji style,no human, spitting letters,close-up，gold coins scattered in the sky，festive atmosphere,  red background, red background with golden decoration , high quality,flat design style,",
+      "clip": [
+        "112",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "12": {
+    "inputs": {
+      "text": "text,human,huge head,large openned mouse,normal quality,bad quality, worse quality,ugly,signature, ，opened mouth,photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting, hand,normal quality,bad quality, worse quality,ugly,signature, ",
+      "clip": [
+        "112",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "14": {
+    "inputs": {
+      "preset": "STANDARD (medium strength)",
+      "model": [
+        "112",
+        0
+      ]
+    },
+    "class_type": "IPAdapterUnifiedLoader",
+    "_meta": {
+      "title": "IPAdapter Unified Loader"
+    }
+  },
+  "16": {
+    "inputs": {
+      "width": 768,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "17": {
+    "inputs": {
+      "samples": [
+        "121",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "18": {
+    "inputs": {
+      "images": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "23": {
+    "inputs": {
+      "weight_style": 1.5,
+      "weight_composition": 0.8,
+      "expand_style": false,
+      "combine_embeds": "average",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "14",
+        0
+      ],
+      "ipadapter": [
+        "14",
+        1
+      ],
+      "image_style": [
+        "95",
+        0
+      ],
+      "image_composition": [
+        "95",
+        0
+      ]
+    },
+    "class_type": "IPAdapterStyleComposition",
+    "_meta": {
+      "title": "IPAdapter Style & Composition SDXL"
+    }
+  },
+  "27": {
+    "inputs": {
+      "image": "cae0b4e8814787467e1609f85d45004b.jpg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "33": {
+    "inputs": {
+      "ckpt_name": "2.5d半写实_2.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "34": {
+    "inputs": {
+      "text": "a human, smile,,wearing red chinese cloth,happy, Hugging hands and placing them on the chest，simple white background, mid shot,standing, happy, Fist each other with both hands，",
+      "clip": [
+        "118",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "35": {
+    "inputs": {
+      "text": "hand,hat,earring，(white cloth:1.2),arms,(floating cloth), red background, red ribbon，some thing on shoulders, animals on the shoulder,other people) hands,Bare clothes，long sheeve cloth, normal quality,bad quality, Double ponytail braid， Leaking arms, leaking thighs，The clothes dancing behind，worse quality,ugly,signature, ，photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting, hand,normal quality,bad quality, worse quality,ugly,signature, ",
+      "clip": [
+        "118",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "36": {
+    "inputs": {
+      "seed": 532569181877454,
+      "steps": 32,
+      "cfg": 7,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "93",
+        0
+      ],
+      "positive": [
+        "41",
+        0
+      ],
+      "negative": [
+        "41",
+        1
+      ],
+      "latent_image": [
+        "37",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "37": {
+    "inputs": {
+      "width": 768,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "38": {
+    "inputs": {
+      "samples": [
+        "36",
+        0
+      ],
+      "vae": [
+        "117",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "39": {
+    "inputs": {
+      "images": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "41": {
+    "inputs": {
+      "strength": 1,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "34",
+        0
+      ],
+      "negative": [
+        "35",
+        0
+      ],
+      "control_net": [
+        "42",
+        0
+      ],
+      "image": [
+        "60",
+        0
+      ],
+      "vae": [
+        "33",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet"
+    }
+  },
+  "42": {
+    "inputs": {
+      "control_net_name": "control_v11p_sd15_openpose.pth"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Load ControlNet Model"
+    }
+  },
+  "43": {
+    "inputs": {
+      "image": "0178f3d49cd159f88ae056fd4e39ce2f8cf3dc3edf245abeddf386168ebaf8a6.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "44": {
+    "inputs": {
+      "detail_method": "VITMatte",
+      "detail_erode": 17,
+      "detail_dilate": 6,
+      "black_point": 0.01,
+      "white_point": 0.99,
+      "process_detail": true,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "image": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "LayerMask: BiRefNetUltra",
+    "_meta": {
+      "title": "LayerMask: BiRefNetUltra"
+    }
+  },
+  "45": {
+    "inputs": {
+      "images": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "50": {
+    "inputs": {
+      "mask": [
+        "44",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "51": {
+    "inputs": {
+      "mask": [
+        "44",
+        1
+      ]
+    },
+    "class_type": "LayerMask: MaskInvert",
+    "_meta": {
+      "title": "LayerMask: MaskInvert"
+    }
+  },
+  "52": {
+    "inputs": {
+      "mask": [
+        "53",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "53": {
+    "inputs": {
+      "radius_x": 1,
+      "radius_y": 1,
+      "masks": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "BlurMaskFast",
+    "_meta": {
+      "title": "Blur Mask (Fast)"
+    }
+  },
+  "60": {
+    "inputs": {
+      "detect_hand": "enable",
+      "detect_body": "enable",
+      "detect_face": "disable",
+      "resolution": 768,
+      "bbox_detector": "yolox_l.onnx",
+      "pose_estimator": "dw-ll_ucoco_384_bs5.torchscript.pt",
+      "scale_stick_for_xinsr_cn": "disable",
+      "image": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "DWPreprocessor",
+    "_meta": {
+      "title": "DWPose Estimator"
+    }
+  },
+  "61": {
+    "inputs": {
+      "images": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "63": {
+    "inputs": {
+      "image": [
+        "44",
+        0
+      ],
+      "alpha": [
+        "53",
+        0
+      ]
+    },
+    "class_type": "JoinImageWithAlpha",
+    "_meta": {
+      "title": "Join Image with Alpha"
+    }
+  },
+  "64": {
+    "inputs": {
+      "image": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "SplitImageWithAlpha",
+    "_meta": {
+      "title": "Split Image with Alpha"
+    }
+  },
+  "65": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 960,
+      "height": 1280,
+      "x_offset": 0,
+      "y_offset": 350,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "17",
+        0
+      ],
+      "overlay_image": [
+        "64",
+        0
+      ],
+      "optional_mask": [
+        "64",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "Image Overlay"
+    }
+  },
+  "66": {
+    "inputs": {
+      "images": [
+        "65",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "67": {
+    "inputs": {
+      "images": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "68": {
+    "inputs": {
+      "images": [
+        "64",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "93": {
+    "inputs": {
+      "weight": 1,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "94",
+        0
+      ],
+      "ipadapter": [
+        "94",
+        1
+      ],
+      "image": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": {
+      "title": "IPAdapter Advanced"
+    }
+  },
+  "94": {
+    "inputs": {
+      "preset": "FACEID PLUS - SD1.5 only",
+      "lora_strength": 0.6,
+      "provider": "CPU",
+      "model": [
+        "118",
+        0
+      ]
+    },
+    "class_type": "IPAdapterUnifiedLoaderFaceID",
+    "_meta": {
+      "title": "IPAdapter Unified Loader FaceID"
+    }
+  },
+  "95": {
+    "inputs": {
+      "image": "ffae2b79-2b88-4561-9232-9c59f0a59a74.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "97": {
+    "inputs": {
+      "detail_method": "VITMatte",
+      "detail_erode": 15,
+      "detail_dilate": 6,
+      "black_point": 0.01,
+      "white_point": 0.99,
+      "process_detail": true,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "image": [
+        "111",
+        0
+      ]
+    },
+    "class_type": "LayerMask: BiRefNetUltra",
+    "_meta": {
+      "title": "LayerMask: BiRefNetUltra"
+    }
+  },
+  "98": {
+    "inputs": {
+      "images": [
+        "97",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "99": {
+    "inputs": {
+      "mask": [
+        "97",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "100": {
+    "inputs": {
+      "mask": [
+        "97",
+        1
+      ]
+    },
+    "class_type": "LayerMask: MaskInvert",
+    "_meta": {
+      "title": "LayerMask: MaskInvert"
+    }
+  },
+  "101": {
+    "inputs": {
+      "mask": [
+        "102",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "102": {
+    "inputs": {
+      "radius_x": 1,
+      "radius_y": 1,
+      "masks": [
+        "100",
+        0
+      ]
+    },
+    "class_type": "BlurMaskFast",
+    "_meta": {
+      "title": "Blur Mask (Fast)"
+    }
+  },
+  "103": {
+    "inputs": {
+      "image": [
+        "97",
+        0
+      ],
+      "alpha": [
+        "102",
+        0
+      ]
+    },
+    "class_type": "JoinImageWithAlpha",
+    "_meta": {
+      "title": "Join Image with Alpha"
+    }
+  },
+  "104": {
+    "inputs": {
+      "image": [
+        "103",
+        0
+      ]
+    },
+    "class_type": "SplitImageWithAlpha",
+    "_meta": {
+      "title": "Split Image with Alpha"
+    }
+  },
+  "105": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 960,
+      "height": 1280,
+      "x_offset": -150,
+      "y_offset": 900,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "65",
+        0
+      ],
+      "overlay_image": [
+        "104",
+        0
+      ],
+      "optional_mask": [
+        "104",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "Image Overlay"
+    }
+  },
+  "106": {
+    "inputs": {
+      "images": [
+        "105",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "107": {
+    "inputs": {
+      "images": [
+        "103",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "108": {
+    "inputs": {
+      "images": [
+        "104",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "109": {
+    "inputs": {
+      "image": "2025-01-17 00_53_02.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "111": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "scale_by": 0.3,
+      "image": [
+        "109",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "112": {
+    "inputs": {
+      "lora_name": "sdxl-niji style_v1.0.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "Lora Loader",
+    "_meta": {
+      "title": "Lora Loader"
+    }
+  },
+  "117": {
+    "inputs": {
+      "vae_name": "kl-f8-anime2-vae_kl-f8-anime2VAE.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "118": {
+    "inputs": {
+      "lora_name": "鲜亮色彩 _ 色彩调节器 Bright color adjuster_v1.0.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 1,
+      "model": [
+        "33",
+        0
+      ],
+      "clip": [
+        "33",
+        1
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA"
+    }
+  },
+  "120": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "105",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "121": {
+    "inputs": {
+      "seed": 665411744566191,
+      "steps": 32,
+      "cfg": 7,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "23",
+        0
+      ],
+      "positive": [
+        "11",
+        0
+      ],
+      "negative": [
+        "12",
+        0
+      ],
+      "latent_image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  }
+}

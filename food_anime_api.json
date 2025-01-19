@@ -1,0 +1,871 @@
+{
+  "10": {
+    "inputs": {
+      "ckpt_name": "sdxl-动漫二次元_2.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "11": {
+    "inputs": {
+      "image": "output (4) (1).png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "12": {
+    "inputs": {
+      "text": "no human,no text,Chinese New Year background with hot pot, dumplings, and sushi vector illustration with copy space on the right side. Flat cartoon style with a red gradient color background，festive atmosphere, flat design style, red background, red background with golden decoration , high quality",
+      "clip": [
+        "10",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "13": {
+    "inputs": {
+      "text": "hand,normal quality,bad quality, worse quality,ugly,signature, ，photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting, hand,normal quality,bad quality, worse quality,ugly,signature, ",
+      "clip": [
+        "10",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "16": {
+    "inputs": {
+      "width": 768,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "17": {
+    "inputs": {
+      "samples": [
+        "97",
+        0
+      ],
+      "vae": [
+        "10",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "18": {
+    "inputs": {
+      "images": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "19": {
+    "inputs": {
+      "weight_style": 1.5,
+      "weight_composition": 1.2,
+      "expand_style": false,
+      "combine_embeds": "average",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "86",
+        0
+      ],
+      "ipadapter": [
+        "86",
+        3
+      ],
+      "image_style": [
+        "86",
+        1
+      ],
+      "image_composition": [
+        "11",
+        0
+      ],
+      "attn_mask": [
+        "86",
+        2
+      ]
+    },
+    "class_type": "IPAdapterStyleComposition",
+    "_meta": {
+      "title": "IPAdapter Style & Composition SDXL"
+    }
+  },
+  "21": {
+    "inputs": {
+      "image": "output (1).jpeg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "22": {
+    "inputs": {
+      "ckpt_name": "☀灵动水彩_v1.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "23": {
+    "inputs": {
+      "text": "a human, smile,（wearing red chinese traditional cloth:1.3), smile eyes,happy, Hugging hands and placing them on the chest，Complex patterns，No obstruction in front of the body，looking at viewers, mid shot,long sheeves, standing,  Fist each other with both hands，simple white background",
+      "clip": [
+        "98",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "24": {
+    "inputs": {
+      "text": "white cloth,text,animals,Expose arm，earring，Hair Decoration，white, ball,animal,umbrella，earring， snakes,text background,Hair accessories, Floating silk ribbon,hand,normal quality,bad quality, Leaking arms,Hair accessories， leaking thighs，floating cloth,The clothes dancing behind，worse quality,ugly,signature, ，photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting, hand,normal quality,bad quality, worse quality,ugly,signature, ",
+      "clip": [
+        "98",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "25": {
+    "inputs": {
+      "seed": 181442908924563,
+      "steps": 32,
+      "cfg": 7,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": [
+        "48",
+        0
+      ],
+      "positive": [
+        "29",
+        0
+      ],
+      "negative": [
+        "29",
+        1
+      ],
+      "latent_image": [
+        "26",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "26": {
+    "inputs": {
+      "width": 768,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "27": {
+    "inputs": {
+      "samples": [
+        "25",
+        0
+      ],
+      "vae": [
+        "22",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "28": {
+    "inputs": {
+      "images": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "29": {
+    "inputs": {
+      "strength": 1,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "23",
+        0
+      ],
+      "negative": [
+        "24",
+        0
+      ],
+      "control_net": [
+        "30",
+        0
+      ],
+      "image": [
+        "40",
+        0
+      ],
+      "vae": [
+        "22",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet"
+    }
+  },
+  "30": {
+    "inputs": {
+      "control_net_name": "control_v11p_sd15_openpose.pth"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Load ControlNet Model"
+    }
+  },
+  "31": {
+    "inputs": {
+      "image": "0178f3d49cd159f88ae056fd4e39ce2f8cf3dc3edf245abeddf386168ebaf8a6.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "32": {
+    "inputs": {
+      "detail_method": "VITMatte",
+      "detail_erode": 18,
+      "detail_dilate": 6,
+      "black_point": 0.01,
+      "white_point": 0.99,
+      "process_detail": true,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "image": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "LayerMask: BiRefNetUltra",
+    "_meta": {
+      "title": "LayerMask: BiRefNetUltra"
+    }
+  },
+  "33": {
+    "inputs": {
+      "images": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "34": {
+    "inputs": {
+      "mask": [
+        "32",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "35": {
+    "inputs": {
+      "mask": [
+        "32",
+        1
+      ]
+    },
+    "class_type": "LayerMask: MaskInvert",
+    "_meta": {
+      "title": "LayerMask: MaskInvert"
+    }
+  },
+  "36": {
+    "inputs": {
+      "mask": [
+        "37",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "37": {
+    "inputs": {
+      "radius_x": 1,
+      "radius_y": 1,
+      "masks": [
+        "35",
+        0
+      ]
+    },
+    "class_type": "BlurMaskFast",
+    "_meta": {
+      "title": "Blur Mask (Fast)"
+    }
+  },
+  "40": {
+    "inputs": {
+      "detect_hand": "enable",
+      "detect_body": "enable",
+      "detect_face": "disable",
+      "resolution": 768,
+      "bbox_detector": "yolox_l.onnx",
+      "pose_estimator": "dw-ll_ucoco_384_bs5.torchscript.pt",
+      "scale_stick_for_xinsr_cn": "disable",
+      "image": [
+        "31",
+        0
+      ]
+    },
+    "class_type": "DWPreprocessor",
+    "_meta": {
+      "title": "DWPose Estimator"
+    }
+  },
+  "41": {
+    "inputs": {
+      "images": [
+        "40",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "42": {
+    "inputs": {
+      "image": [
+        "32",
+        0
+      ],
+      "alpha": [
+        "37",
+        0
+      ]
+    },
+    "class_type": "JoinImageWithAlpha",
+    "_meta": {
+      "title": "Join Image with Alpha"
+    }
+  },
+  "43": {
+    "inputs": {
+      "image": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "SplitImageWithAlpha",
+    "_meta": {
+      "title": "Split Image with Alpha"
+    }
+  },
+  "44": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 960,
+      "height": 1280,
+      "x_offset": 0,
+      "y_offset": 260,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "17",
+        0
+      ],
+      "overlay_image": [
+        "43",
+        0
+      ],
+      "optional_mask": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "Image Overlay"
+    }
+  },
+  "45": {
+    "inputs": {
+      "images": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "46": {
+    "inputs": {
+      "images": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "47": {
+    "inputs": {
+      "images": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "48": {
+    "inputs": {
+      "weight": 1,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "79",
+        0
+      ],
+      "ipadapter": [
+        "79",
+        3
+      ],
+      "image": [
+        "79",
+        1
+      ]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": {
+      "title": "IPAdapter Advanced"
+    }
+  },
+  "50": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 960,
+      "height": 1280,
+      "x_offset": -100,
+      "y_offset": 850,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "44",
+        0
+      ],
+      "overlay_image": [
+        "64",
+        0
+      ],
+      "optional_mask": [
+        "64",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "Image Overlay"
+    }
+  },
+  "51": {
+    "inputs": {
+      "image": "text_2025 (2).png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "54": {
+    "inputs": {
+      "detail_method": "VITMatte",
+      "detail_erode": 10,
+      "detail_dilate": 6,
+      "black_point": 0.11,
+      "white_point": 0.93,
+      "process_detail": true,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "image": [
+        "55",
+        0
+      ]
+    },
+    "class_type": "LayerMask: BiRefNetUltra",
+    "_meta": {
+      "title": "LayerMask: BiRefNetUltra"
+    }
+  },
+  "55": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "scale_by": 0.41000000000000003,
+      "image": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "56": {
+    "inputs": {
+      "mask": [
+        "54",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "57": {
+    "inputs": {
+      "images": [
+        "54",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "59": {
+    "inputs": {
+      "mask": [
+        "54",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "InvertMask"
+    }
+  },
+  "60": {
+    "inputs": {
+      "radius_x": 1,
+      "radius_y": 1,
+      "masks": [
+        "59",
+        0
+      ]
+    },
+    "class_type": "BlurMaskFast",
+    "_meta": {
+      "title": "Blur Mask (Fast)"
+    }
+  },
+  "61": {
+    "inputs": {
+      "mask": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "62": {
+    "inputs": {
+      "mask": [
+        "59",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "63": {
+    "inputs": {
+      "image": [
+        "54",
+        0
+      ],
+      "alpha": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "JoinImageWithAlpha",
+    "_meta": {
+      "title": "Join Image with Alpha"
+    }
+  },
+  "64": {
+    "inputs": {
+      "image": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "SplitImageWithAlpha",
+    "_meta": {
+      "title": "Split Image with Alpha"
+    }
+  },
+  "76": {
+    "inputs": {
+      "upscale_model": [
+        "77",
+        0
+      ],
+      "image": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale Image (using Model)"
+    }
+  },
+  "77": {
+    "inputs": {
+      "model_name": "RealESRGAN_x4plus.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "78": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "scale_by": 2,
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "79": {
+    "inputs": {
+      "preset": "FACEID PLUS - SD1.5 only",
+      "lora_strength": 0.6,
+      "provider": "CPU",
+      "weight": 0.6,
+      "weight_faceidv2": 1,
+      "start_at": 0,
+      "end_at": 1,
+      "cache_mode": "all",
+      "use_tiled": false,
+      "model": [
+        "98",
+        0
+      ],
+      "image": [
+        "21",
+        0
+      ]
+    },
+    "class_type": "easy ipadapterApply",
+    "_meta": {
+      "title": "Easy Apply IPAdapter"
+    }
+  },
+  "80": {
+    "inputs": {
+      "images": [
+        "78",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "86": {
+    "inputs": {
+      "preset": "STANDARD (medium strength)",
+      "lora_strength": 0.6,
+      "provider": "CUDA",
+      "weight": 1,
+      "weight_faceidv2": 1,
+      "start_at": 0,
+      "end_at": 1,
+      "cache_mode": "all",
+      "use_tiled": false,
+      "model": [
+        "10",
+        0
+      ],
+      "image": [
+        "11",
+        0
+      ],
+      "attn_mask": [
+        "11",
+        1
+      ]
+    },
+    "class_type": "easy ipadapterApply",
+    "_meta": {
+      "title": "Easy Apply IPAdapter"
+    }
+  },
+  "93": {
+    "inputs": {
+      "images": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "94": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "78",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "97": {
+    "inputs": {
+      "seed": 1094009108089975,
+      "steps": 32,
+      "cfg": 7,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "19",
+        0
+      ],
+      "positive": [
+        "12",
+        0
+      ],
+      "negative": [
+        "13",
+        0
+      ],
+      "latent_image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "98": {
+    "inputs": {
+      "lora_name": "鲜亮色彩 _ 色彩调节器 Bright color adjuster_v1.0.safetensors",
+      "strength_model": 0.7000000000000001,
+      "strength_clip": 1,
+      "model": [
+        "22",
+        0
+      ],
+      "clip": [
+        "22",
+        1
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA"
+    }
+  }
+}
