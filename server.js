@@ -6,8 +6,10 @@ const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 
-// 先定义ComfyUI服务器地址
-const COMFY_API = 'http://127.0.0.1:6006';
+// 修改ComfyUI服务器地址
+const COMFY_API = process.env.NODE_ENV === 'production' 
+    ? 'http://0.0.0.0:6006'  // 在AUTODL上使用
+    : 'http://127.0.0.1:6006';  // 本地开发时使用
 
 const app = express();
 
