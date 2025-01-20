@@ -1032,12 +1032,12 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'Accept': '*/*'
-                        },
-                        timeout: 30000  // 30秒超时
+                            'Accept': '*/*',
+                            'Content-Type': 'multipart/form-data'  // 添加正确的Content-Type
+                        }
                     }).catch(error => {
                         console.error('网络错误:', error);
-                        throw new Error(`网络连接失败: ${error.message}`);
+                        throw new Error(`网络连接失败，请稍后重试`);
                     });
 
                     console.log('上传状态:', uploadResponse.status);
@@ -1047,7 +1047,9 @@
                     console.log('原始响应:', responseText);
 
                     if (!uploadResponse.ok) {
-                        throw new Error(`上传失败: ${responseText}`);
+                        const errorText = await uploadResponse.text();
+                        console.error('上传响应:', errorText);
+                        throw new Error('图片上传失败，请重试');
                     }
 
                     let uploadResult;
