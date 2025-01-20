@@ -6,42 +6,40 @@ const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 
-const app = express();
-
 // 先定义ComfyUI服务器地址
 const COMFY_API = 'http://127.0.0.1:6006';
 
-// 修改CORS配置
+const app = express();
+
+// 配置文件上传
+const upload = multer({ dest: 'uploads/' });
+
+// 确保uploads目录存在
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// 基础中间件配置
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Accept']
 }));
 
-// 添加OPTIONS请求处理
-app.options('*', cors());
-
-// 修改健康检查接口
-app.get('/api/health', (req, res) => {
-    try {
-        res.json({ 
-            status: 'ok',
-            comfyui_url: COMFY_API,
-            server_time: new Date().toISOString(),
-            message: '服务正常运行'
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            error: error.message
-        });
-    }
-});
-
+// 静态文件服务
 app.use(express.static(__dirname));
 
-// 配置文件上传
-const upload = multer({ dest: 'uploads/' });
+// 健康检查接口
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        comfyui_url: COMFY_API,
+        server_time: new Date().toISOString(),
+        message: '服务正常运行'
+    });
+});
 
 // 工作流配置映射
 const workflowConfig = {
@@ -134,11 +132,6 @@ function updateSamplerSeeds(workflow) {
         }
     }
     return workflow;
-}
-
-// 确保uploads目录存在
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
 }
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
