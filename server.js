@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
@@ -111,86 +111,70 @@ function updateSamplerSeeds(workflow) {
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
-        // 获取工作流名称
-        const workflowName = req.body.workflow || 'shanzi_gif_api.json';
+        console.log('收到生成请求');
         
-        // 获取工作流配置
-        const config = workflowConfig[workflowName];
-        if (!config) {
-            throw new Error(`未找到工作流 ${workflowName} 的配置`);
-        }
-
-        // 验证工作流文件是否存在
-        const workflowPath = path.join(__dirname, workflowName);
-        if (!fs.existsSync(workflowPath)) {
-            throw new Error(`工作流文件 ${workflowName} 不存在`);
-        }
-
-        // 加载工作流配置
-        const workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
-        console.log(`加载工作流: ${workflowName}`);
-
         // 1. 上传图片到ComfyUI
         const formData = new FormData();
         formData.append('image', fs.createReadStream(req.file.path));
         
+        console.log('开始上传图片到ComfyUI');
         const uploadResponse = await fetch(`${COMFY_API}/upload/image`, {
             method: 'POST',
             body: formData
         });
 
+        if (!uploadResponse.ok) {
+            throw new Error('图片上传到ComfyUI失败');
+        }
+
         const uploadResult = await uploadResponse.json();
         console.log('图片上传成功:', uploadResult);
-        
-        // 创建工作流副本并更新种子
-        const workflowCopy = updateSamplerSeeds(JSON.parse(JSON.stringify(workflow)));
-        const inputNode = workflowCopy[config.inputNode];
 
-        // 更新图片输入
-        if (!inputNode || !inputNode.inputs || !inputNode.inputs.image) {
-            throw new Error('工作流中未找到正确的图片输入节点');
-        }
-        inputNode.inputs.image = uploadResult.name;
+        // 2. 加载工作流
+        const workflowName = req.body.workflow || 'shanzi_gif_api.json';
+        const workflowPath = path.join(__dirname, workflowName);
         
-        console.log(`更新节点 ${config.inputNode} 的图片输入和随机种子`);
-        
-        // 3. 发送到ComfyUI
+        console.log('加载工作流:', workflowPath);
+        const workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
+
+        // 3. 更新工作流中的图片
+        workflow['21'].inputs.image = uploadResult.name;
+
+        // 4. 发送工作流到ComfyUI
+        console.log('发送工作流到ComfyUI');
         const promptResponse = await fetch(`${COMFY_API}/prompt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                prompt: workflowCopy
+                prompt: workflow
             })
         });
 
-        const promptResult = await promptResponse.json();
-        console.log('工作流开始执行:', promptResult);
-
-        if (promptResult.error) {
-            throw new Error(promptResult.error.message || '工作流执行失败');
+        if (!promptResponse.ok) {
+            throw new Error('工作流执行失败');
         }
 
-        // 4. 等待执行完成并获取结果
-        const result = await waitForResult(promptResult.prompt_id, config);
-        console.log('工作流执行完成，输出URL:', result.output_url);
-        
-        // 5. 清理上传的临时文件
-        fs.unlink(req.file.path, (err) => {
-            if (err) console.error('清理临时文件失败:', err);
-        });
+        const promptResult = await promptResponse.json();
+        console.log('工作流执行结果:', promptResult);
 
-        res.json(result);
+        // 5. 返回结果
+        res.json({
+            success: true,
+            output_url: `${COMFY_API}/view?filename=${promptResult.output}&type=output`
+        });
 
     } catch (error) {
         console.error('处理失败:', error);
+        res.status(500).json({ error: error.message });
+    } finally {
+        // 清理临时文件
         if (req.file) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error('清理临时文件失败:', err);
             });
         }
-        res.status(500).json({ error: error.message });
     }
 });
 
@@ -236,4 +220,5 @@ app.get('/api/download', async (req, res) => {
 
 app.listen(3003, () => {
     console.log('服务器运行在 http://localhost:3003');
+    console.log('ComfyUI地址:', COMFY_API);
 }); 
