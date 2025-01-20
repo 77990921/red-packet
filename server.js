@@ -8,8 +8,8 @@ const path = require('path');
 
 // 修改ComfyUI服务器地址
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://127.0.0.1:6006'  // 在AUTODL上使用localhost
-    : 'http://127.0.0.1:6006';  // 本地开发时使用
+    ? 'http://127.0.0.1:6006'  // ComfyUI已经在6006端口
+    : 'http://127.0.0.1:6006';
 
 const app = express();
 
@@ -320,7 +320,7 @@ app.get('/api/download', async (req, res) => {
     }
 });
 
-app.listen(6006, '0.0.0.0', () => {
-    console.log('服务器运行在 http://0.0.0.0:6006');
+app.listen(8188, '0.0.0.0', () => {  // Node.js使用8188端口
+    console.log('服务器运行在 http://0.0.0.0:8188');
     console.log('ComfyUI地址:', COMFY_API);
 }); 
