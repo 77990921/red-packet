@@ -16,9 +16,5 @@
       ]
     }
   ],
-  "regions": ["sfo1"],
-  "timeouts": {
-    "read": 60,
-    "write": 60
-  }
+  "regions": ["sfo1"]
 } 
