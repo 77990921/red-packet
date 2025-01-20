@@ -8,7 +8,7 @@ const path = require('path');
 
 // 修改ComfyUI服务器地址
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://0.0.0.0:6006'  // 在AUTODL上使用
+    ? 'http://127.0.0.1:6006'  // 在AUTODL上使用localhost
     : 'http://127.0.0.1:6006';  // 本地开发时使用
 
 const app = express();
@@ -93,7 +93,9 @@ async function waitForResult(promptId, config) {
                         const file = output[config.outputType][0];
                         console.log(`找到输出文件:`, file);
                         return {
-                            output_url: `${COMFY_API}/view?filename=${encodeURIComponent(file.filename)}&type=output&subfolder=${encodeURIComponent(file.subfolder || '')}`
+                            output_url: process.env.NODE_ENV === 'production'
+                                ? `/api/view?filename=${encodeURIComponent(file.filename)}&type=output&subfolder=${encodeURIComponent(file.subfolder || '')}`
+                                : `${COMFY_API}/view?filename=${encodeURIComponent(file.filename)}&type=output&subfolder=${encodeURIComponent(file.subfolder || '')}`
                         };
                     }
                 }
