@@ -8,8 +8,8 @@ const path = require('path');
 
 // 修改ComfyUI服务器地址
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://127.0.0.1:8866'  // ComfyUI使用8866端口
-    : 'http://127.0.0.1:8866';
+    ? 'http://127.0.0.1:6006'  // ComfyUI使用6006端口
+    : 'http://127.0.0.1:6006';
 
 const app = express();
 
