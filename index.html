@@ -1023,7 +1023,6 @@
                 nextBtn.disabled = true;
 
                 try {
-                    // 添加更多日志输出
                     console.log('开始上传图片...');
                     const formData = new FormData();
                     formData.append('image', uploadedImage);
@@ -1032,8 +1031,7 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'Accept': '*/*',
-                            'Content-Type': 'multipart/form-data'  // 添加正确的Content-Type
+                            'Accept': '*/*'
                         }
                     }).catch(error => {
                         console.error('网络错误:', error);
@@ -1043,23 +1041,16 @@
                     console.log('上传状态:', uploadResponse.status);
                     console.log('上传响应头:', Object.fromEntries(uploadResponse.headers.entries()));
 
-                    const responseText = await uploadResponse.text();
-                    console.log('原始响应:', responseText);
-
                     if (!uploadResponse.ok) {
                         const errorText = await uploadResponse.text();
-                        console.error('上传响应:', errorText);
+                        console.error('上传失败:', errorText);
                         throw new Error('图片上传失败，请重试');
                     }
 
-                    let uploadResult;
-                    try {
-                        uploadResult = JSON.parse(responseText);
-                    } catch (e) {
-                        console.error('解析响应失败:', e);
-                        throw new Error('服务器响应格式错误');
-                    }
-                    
+                    // 只读取一次响应内容
+                    const uploadResult = await uploadResponse.json();
+                    console.log('上传成功:', uploadResult);
+
                     // 加载工作流文件
                     const workflowResponse = await fetch(workflow);
                     const workflowData = await workflowResponse.json();
