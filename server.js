@@ -11,27 +11,12 @@ const COMFY_API = 'http://127.0.0.1:6006';
 
 const app = express();
 
-// 配置文件上传
-const upload = multer({ dest: 'uploads/' });
-
-// 确保uploads目录存在
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
-
-// 基础中间件配置
+// 基础中间件配置 - 必须在所有路由之前
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Accept']
-}));
+app.use(cors());
 
-// 静态文件服务
-app.use(express.static(__dirname));
-
-// 健康检查接口
+// 健康检查接口 - 必须在基础中间件之后，其他路由之前
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
@@ -40,6 +25,17 @@ app.get('/api/health', (req, res) => {
         message: '服务正常运行'
     });
 });
+
+// 配置文件上传
+const upload = multer({ dest: 'uploads/' });
+
+// 确保uploads目录存在
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// 静态文件服务
+app.use(express.static(__dirname));
 
 // 工作流配置映射
 const workflowConfig = {
