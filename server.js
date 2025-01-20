@@ -14,7 +14,7 @@ app.use(express.static(__dirname));
 const upload = multer({ dest: 'uploads/' });
 
 // ComfyUI服务器地址
-const COMFY_API = 'http://localhost:6006';
+const COMFY_API = 'http://127.0.0.1:6006';
 
 // 工作流配置映射
 const workflowConfig = {
