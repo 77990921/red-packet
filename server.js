@@ -111,51 +111,46 @@ function updateSamplerSeeds(workflow) {
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
-        console.log('收到生成请求，请求体:', req.body);
-        console.log('上传的文件:', req.file);
+        console.log('收到生成请求');
+        const workflowName = req.body.workflow;
+        const config = workflowConfig[workflowName];
         
-        if (!req.file) {
-            throw new Error('未收到上传的图片');
+        if (!config) {
+            throw new Error(`未找到工作流 ${workflowName} 的配置`);
         }
 
-        // 验证文件是否存在
-        if (!fs.existsSync(req.file.path)) {
-            throw new Error('上传的文件不存在');
-        }
-
+        // 1. 上传图片
         const formData = new FormData();
         formData.append('image', fs.createReadStream(req.file.path));
         
-        console.log('开始上传图片到ComfyUI');
         const uploadResponse = await fetch(`${COMFY_API}/upload/image`, {
             method: 'POST',
             body: formData
-        }).catch(error => {
-            console.error('上传请求失败:', error);
-            throw new Error('连接ComfyUI失败');
         });
 
-        console.log('上传响应状态:', uploadResponse.status);
-        
         if (!uploadResponse.ok) {
-            throw new Error('图片上传到ComfyUI失败');
+            throw new Error('图片上传失败');
         }
 
         const uploadResult = await uploadResponse.json();
         console.log('图片上传成功:', uploadResult);
 
         // 2. 加载工作流
-        const workflowName = req.body.workflow || 'shanzi_gif_api.json';
         const workflowPath = path.join(__dirname, workflowName);
+        let workflow;
+        try {
+            workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
+        } catch (error) {
+            throw new Error(`工作流文件读取失败: ${workflowName}`);
+        }
+
+        // 3. 更新工作流中的图片节点
+        workflow[config.inputNode].inputs.image = uploadResult.name;
         
-        console.log('加载工作流:', workflowPath);
-        const workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
+        // 4. 更新随机种子
+        workflow = updateSamplerSeeds(workflow);
 
-        // 3. 更新工作流中的图片
-        workflow['21'].inputs.image = uploadResult.name;
-
-        // 4. 发送工作流到ComfyUI
-        console.log('发送工作流到ComfyUI');
+        // 5. 执行工作流
         const promptResponse = await fetch(`${COMFY_API}/prompt`, {
             method: 'POST',
             headers: {
@@ -171,21 +166,16 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         }
 
         const promptResult = await promptResponse.json();
-        console.log('工作流执行结果:', promptResult);
-
-        // 5. 返回结果
-        res.json({
-            success: true,
-            output_url: `${COMFY_API}/view?filename=${promptResult.output}&type=output`
-        });
+        
+        // 6. 等待结果
+        const result = await waitForResult(promptResult.prompt_id, config);
+        
+        // 7. 返回结果
+        res.json(result);
 
     } catch (error) {
         console.error('处理失败:', error);
-        res.status(500).json({ 
-            error: error.message,
-            stack: error.stack,
-            details: '请检查服务器日志'
-        });
+        res.status(500).json({ error: error.message });
     } finally {
         // 清理临时文件
         if (req.file) {
