@@ -18,6 +18,23 @@ app.use(cors({
 // 添加OPTIONS请求处理
 app.options('*', cors());
 
+// 添加健康检查接口 - 移到这里
+app.get('/api/health', (req, res) => {
+    try {
+        res.json({ 
+            status: 'ok',
+            comfyui: COMFY_API,
+            timestamp: new Date().toISOString(),
+            message: '服务正常运行'
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            error: error.message
+        });
+    }
+});
+
 app.use(express.static(__dirname));
 
 // 配置文件上传
@@ -118,23 +135,6 @@ function updateSamplerSeeds(workflow) {
     }
     return workflow;
 }
-
-// 添加健康检查接口 - 移到最前面
-app.get('/api/health', (req, res) => {
-    try {
-        res.json({ 
-            status: 'ok',
-            comfyui: COMFY_API,
-            timestamp: new Date().toISOString(),
-            message: '服务正常运行'
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            error: error.message
-        });
-    }
-});
 
 // 确保uploads目录存在
 if (!fs.existsSync('uploads')) {
