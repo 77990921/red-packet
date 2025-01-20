@@ -1017,16 +1017,14 @@
                 formData.append('image', uploadedImage);
                 formData.append('workflow', workflowMap[selectedStyle][selectedBackground]);
 
-                console.log('开始生成，使用工作流:', workflowMap[selectedStyle][selectedBackground]);
-
-                // 发送到服务器
+                // 发送生成请求
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     body: formData
                 });
 
                 if (!response.ok) {
-                    throw new Error('生成请求失败');
+                    throw new Error('生成失败');
                 }
 
                 const result = await response.json();
@@ -1046,7 +1044,7 @@
             } catch (error) {
                 console.error('生成失败:', error);
                 loadingElement.style.display = 'none';
-                alert('生成失败: ' + error.message);
+                alert(error.message || '生成失败，请重试');
             }
         }
 

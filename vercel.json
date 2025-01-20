@@ -1,12 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/generate",
-      "destination": "http://connect.nmb1.seetacloud.com:44854/generate"
-    },
-    {
-      "source": "/api/download",
-      "destination": "http://connect.nmb1.seetacloud.com:44854/download"
+      "source": "/api/:path*",
+      "destination": "http://connect.nmb1.seetacloud.com:3003/api/:path*"
     }
   ],
   "headers": [
