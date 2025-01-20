@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:6006/:path*"
+      "destination": "http://connect.nmb1.seetacloud.com:44854/:path*"
     }
   ],
   "headers": [
@@ -16,5 +16,9 @@
       ]
     }
   ],
-  "regions": ["sfo1"]
+  "regions": ["sfo1"],
+  "timeouts": {
+    "read": 60,
+    "write": 60
+  }
 } 
