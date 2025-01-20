@@ -7,7 +7,17 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-app.use(cors());
+
+// 修改CORS配置
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept']
+}));
+
+// 添加OPTIONS请求处理
+app.options('*', cors());
+
 app.use(express.static(__dirname));
 
 // 配置文件上传
@@ -109,10 +119,36 @@ function updateSamplerSeeds(workflow) {
     return workflow;
 }
 
+// 添加健康检查接口 - 移到最前面
+app.get('/api/health', (req, res) => {
+    try {
+        res.json({ 
+            status: 'ok',
+            comfyui: COMFY_API,
+            timestamp: new Date().toISOString(),
+            message: '服务正常运行'
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            error: error.message
+        });
+    }
+});
+
+// 确保uploads目录存在
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
-        console.log('收到生成请求');
+        console.log('收到生成请求，请求体:', req.body);
+        console.log('上传的文件:', req.file);
+        
         const workflowName = req.body.workflow;
+        console.log('使用工作流:', workflowName);
+        
         const config = workflowConfig[workflowName];
         
         if (!config) {
@@ -175,7 +211,12 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('处理失败:', error);
-        res.status(500).json({ error: error.message });
+        console.error('错误堆栈:', error.stack);
+        res.status(500).json({ 
+            error: error.message,
+            stack: error.stack,
+            details: '请检查服务器日志'
+        });
     } finally {
         // 清理临时文件
         if (req.file) {
@@ -224,15 +265,6 @@ app.get('/api/download', async (req, res) => {
         console.error('下载失败:', error);
         res.status(500).json({ error: error.message });
     }
-});
-
-// 添加健康检查接口
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'ok',
-        comfyui: COMFY_API,
-        timestamp: new Date().toISOString()
-    });
 });
 
 app.listen(44854, '0.0.0.0', () => {
