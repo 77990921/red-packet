@@ -929,6 +929,9 @@
         let selectedStyle = null;
         let selectedBackground = null;
 
+        // 根据环境设置API地址
+        const API_BASE_URL = 'http://connect.nmb1.seetacloud.com:6006';  // 直接使用ComfyUI的地址
+
         // 更新步骤显示
         function updateSteps(step) {
             document.querySelectorAll('.step-item').forEach(item => {
@@ -994,67 +997,101 @@
             }
 
             try {
-                // 显示加载状态
-                const loadingElement = document.querySelector('.loading');
-                const resultWrapper = document.querySelector('.result-wrapper');
-                loadingElement.style.display = 'flex';
-                resultWrapper.style.display = 'none';
-
-                // 禁用按钮
-                const prevBtn = document.querySelector('.prev-btn');
-                const nextBtn = document.querySelector('.next-btn');
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-
-                // 更新步骤
-                currentStep = 2;
-                updateSteps(currentStep);
-
                 // 获取对应的工作流
                 const workflow = workflowMap[selectedStyle][selectedBackground];
-                
+                if (!workflow) {
+                    throw new Error('未找到对应的工作流配置');
+                }
+
                 // 创建 FormData 对象
                 const formData = new FormData();
                 formData.append('image', uploadedImage);
                 formData.append('workflow', workflow);
 
-                // 调用后端 API
-                const response = await fetch('http://localhost:3003/api/generate', {
-                    method: 'POST',
-                    body: formData
-                });
+                // 显示加载状态和禁用按钮
+                const loadingElement = document.querySelector('.loading');
+                const resultWrapper = document.querySelector('.result-wrapper');
+                const prevBtn = document.querySelector('.prev-btn');
+                const nextBtn = document.querySelector('.next-btn');
+                
+                loadingElement.style.display = 'flex';
+                resultWrapper.style.display = 'none';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText);
+                // 上传图片并执行工作流
+                try {
+                    // 上传图片
+                    const uploadResponse = await fetch(`${API_BASE_URL}/upload/image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error('图片上传失败');
+                    }
+
+                    const uploadResult = await uploadResponse.json();
+                    
+                    // 发送工作流请求
+                    const promptResponse = await fetch(`${API_BASE_URL}/prompt`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            prompt: workflow
+                        })
+                    });
+
+                    if (!promptResponse.ok) {
+                        throw new Error('工作流执行失败');
+                    }
+
+                    const promptResult = await promptResponse.json();
+                    
+                    // 等待结果
+                    let retryCount = 0;
+                    const maxRetries = 300; // 5分钟超时
+                    
+                    while (retryCount < maxRetries) {
+                        const historyResponse = await fetch(`${API_BASE_URL}/history/${promptResult.prompt_id}`);
+                        const history = await historyResponse.json();
+                        
+                        if (history[promptResult.prompt_id]?.outputs) {
+                            const output = history[promptResult.prompt_id].outputs;
+                            const outputUrl = `${API_BASE_URL}/view?filename=${output.filename}&type=output&subfolder=${output.subfolder || ''}`;
+                            
+                            // 显示结果
+                            const resultImage = document.querySelector('.result-image');
+                            resultImage.src = outputUrl;
+                            
+                            loadingElement.style.display = 'none';
+                            resultWrapper.style.display = 'flex';
+                            break;
+                        }
+                        
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        retryCount++;
+                    }
+                    
+                    if (retryCount >= maxRetries) {
+                        throw new Error('生成超时，请重试');
+                    }
+
+                } finally {
+                    // 恢复按钮状态
+                    prevBtn.disabled = false;
+                    nextBtn.disabled = false;
                 }
-
-                const data = await response.json();
-                
-                // 显示结果
-                const resultImage = document.querySelector('.result-image');
-                resultImage.src = data.output_url;
-                
-                // 隐藏加载状态，显示结果
-                loadingElement.style.display = 'none';
-                resultWrapper.style.display = 'flex';
-
-                // 启用按钮
-                prevBtn.disabled = false;
-                nextBtn.disabled = false;
 
             } catch (error) {
                 console.error('生成失败:', error);
+                alert('生成失败，请重试: ' + error.message);
+                
+                // 恢复显示状态
                 const loadingElement = document.querySelector('.loading');
                 loadingElement.style.display = 'none';
-                
-                // 启用按钮
-                const prevBtn = document.querySelector('.prev-btn');
-                const nextBtn = document.querySelector('.next-btn');
-                prevBtn.disabled = false;
-                nextBtn.disabled = false;
-                
-                alert('生成失败，请重试: ' + error.message);
             }
         }
 
@@ -1138,268 +1175,6 @@
             }
         }
 
-        // 其他函数...
-        function selectBackground(background, element) {
-            // 移除所有选项的selected类和蒙版
-            document.querySelectorAll('.background-option').forEach(opt => {
-                opt.classList.remove('selected');
-                opt.classList.remove('masked'); // 移除蒙版
-                opt.style.borderColor = 'transparent'; // 重置边框颜色
-            });
-            
-            // 添加selected类到选中的选项
-            element.classList.add('selected');
-            element.style.borderColor = 'gold'; // 设置选中时的边框颜色
-
-            // 给未选中的选项添加蒙版
-            document.querySelectorAll('.background-option').forEach(opt => {
-                if (!opt.classList.contains('selected')) {
-                    opt.classList.add('masked'); // 添加蒙版
-                }
-            });
-
-            // 更新选中的背景
-            selectedBackground = background; // 设置选中的背景
-        }
-
-        async function callWorkflowApi(workflow) {
-            if (workflow === 'fan_anime') {
-                const resultContainer = document.querySelector('.result-container');
-                const loadingElement = resultContainer.querySelector('.loading');
-                if (loadingElement) {
-                    loadingElement.style.display = 'block';
-                }
-
-                try {
-                    console.log('开始连接服务器...');
-                    
-                    // 修改服务器地址配置
-                    const serverUrl = 'http://localhost:3003/api';  // 改为3003
-
-                    console.log('准备上传图片...');
-                    const formData = new FormData();
-                    
-                    // 从 base64 创建 Blob
-                    const base64Data = uploadedImage.split(',')[1];
-                    const byteCharacters = atob(base64Data);
-                    const byteArrays = [];
-                    
-                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                        const slice = byteCharacters.slice(offset, offset + 512);
-                        const byteNumbers = new Array(slice.length);
-                        for (let i = 0; i < slice.length; i++) {
-                            byteNumbers[i] = slice.charCodeAt(i);
-                        }
-                        const byteArray = new Uint8Array(byteNumbers);
-                        byteArrays.push(byteArray);
-                    }
-                    
-                    const blob = new Blob(byteArrays, { type: 'image/jpeg' });
-                    formData.append('image', blob, 'input.jpg');
-
-                    console.log('开始上传图片...');
-                    const uploadResponse = await fetch(`${serverUrl}/upload/image`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (!uploadResponse.ok) {
-                        const errorText = await uploadResponse.text();
-                        console.error('图片上传失败:', errorText);
-                        throw new Error(`图片上传失败: ${errorText}`);
-                    }
-
-                    const uploadResult = await uploadResponse.json();
-                    console.log('图片上传成功:', uploadResult);
-
-                    // 发送工作流请求
-                    console.log('发送工作流请求...');
-                    const response = await fetch(`${serverUrl}/queue`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            prompt: {
-                                "10": {
-                                    "inputs": {
-                                        "ckpt_name": "sdxl-动漫二次元_2.0.safetensors"
-                                    },
-                                    "class_type": "CheckpointLoaderSimple"
-                                },
-                                "11": {
-                                    "inputs": {
-                                        "image": "input.jpg",
-                                        "upload": "image"
-                                    },
-                                    "class_type": "LoadImage"
-                                },
-                                "12": {
-                                    "inputs": {
-                                        "text": "no human,Many fans，festive atmosphere, flat design style, red background, red background with golden decoration , high quality",
-                                        "clip": ["10", 1]
-                                    },
-                                    "class_type": "CLIPTextEncode"
-                                },
-                                "13": {
-                                    "inputs": {
-                                        "text": "hand,normal quality,bad quality, worse quality,ugly,signature, photo, deformed, black and white, realism, disfigured, low contrast, ugly, deformed, noisy, low poly, blurry, painting",
-                                        "clip": ["10", 1]
-                                    },
-                                    "class_type": "CLIPTextEncode"
-                                },
-                                "94": {
-                                    "inputs": {
-                                        "filename_prefix": "ComfyUI",
-                                        "images": ["78", 0]
-                                    },
-                                    "class_type": "SaveImage"
-                                }
-                            },
-                            client_id: `test_${Date.now()}`
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('工作流提交失败:', errorText);
-                        throw new Error(`工作流提交失败: ${errorText}`);
-                    }
-
-                    const responseText = await response.text();
-                    console.log('服务器原始响应:', responseText);
-
-                    let result;
-                    try {
-                        result = JSON.parse(responseText);
-                        console.log('工作流提交结果:', result);
-                    } catch (error) {
-                        console.error('解析响应JSON失败:', error);
-                        throw new Error('无法解析服务器响应');
-                    }
-
-                    if (!result || !result.prompt_id) {
-                        throw new Error('服务器返回的数据格式不正确');
-                    }
-
-                    // 修改轮询参数
-                    let attempts = 0;
-                    const maxAttempts = 60;  // 增加到 60 次
-                    const pollInterval = 5000;  // 增加到 5 秒
-
-                    const checkResult = async () => {
-                        if (attempts >= maxAttempts) {
-                            throw new Error('生成超时，请重试');
-                        }
-
-                        try {
-                            console.log(`第 ${attempts + 1}/${maxAttempts} 次检查结果...`);
-                            
-                            const historyResponse = await fetch(`${serverUrl}/history/${result.prompt_id}`);
-                            const history = await historyResponse.json();
-                            
-                            console.log('获取到的历史记录:', history);
-
-                            // 如果有错误，立即抛出
-                            if (history.error) {
-                                throw new Error(`生成出错: ${history.error.message || '未知错误'}`);
-                            }
-
-                            // 如果工作流已完成且有输出
-                            if (!history.executing && history.outputs && history.outputs.images) {
-                                console.log('工作流完成，获取图片...');
-                                const filename = history.outputs.images[0].filename;
-                                const imageResponse = await fetch(`${serverUrl}/view?filename=${filename}`);
-                                
-                                if (imageResponse.ok) {
-                                    const imageBlob = await imageResponse.blob();
-                                    const imageUrl = URL.createObjectURL(imageBlob);
-                                    displayGeneratedResult({ image: imageUrl });
-                                    return;  // 成功后直接返回，不再继续轮询
-                                } else {
-                                    throw new Error('获取生成的图片失败');
-                                }
-                            }
-
-                            // 如果还在执行或没有输出，继续轮询
-                            console.log('工作流还在执行，继续等待...');
-                            attempts++;
-                            await new Promise(resolve => setTimeout(resolve, pollInterval));
-                            return checkResult();
-
-                        } catch (error) {
-                            console.error('检查结果出错:', error);
-                            attempts++;
-                            if (attempts < maxAttempts) {
-                                await new Promise(resolve => setTimeout(resolve, pollInterval));
-                                return checkResult();
-                            }
-                            throw error;
-                        }
-                    };
-
-                    // 在开始检查之前添加较短的延迟
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // 等待 2 秒后开始检查
-                    console.log('开始检查生成结果...');
-                    await checkResult();
-
-                } catch (error) {
-                    console.error('API调用详细错误:', error);
-                    if (loadingElement) {
-                        loadingElement.style.display = 'none';
-                    }
-                    alert(`生成失败: ${error.message}\n请确保服务器正在运行`);
-                    throw error;
-                }
-            }
-        }
-
-        // 更新显示结果的函数
-        function displayGeneratedResult(result) {
-            const resultContainer = document.querySelector('.result-container');
-            const loadingElement = resultContainer.querySelector('.loading');
-            const resultImage = resultContainer.querySelector('.result-image');
-
-            // 隐藏加载提示
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
-
-            // 显示结果图片
-            if (resultImage && result.image) {
-                resultImage.src = result.image;
-                resultImage.style.display = 'block';
-            } else {
-                console.error('未能获取到生成结果');
-            }
-        }
-
-        // 添加 WebSocket 连接
-        const ws = new WebSocket('ws://localhost:3002');
-
-        ws.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            console.log('收到 WebSocket 消息:', message);
-            
-            // 处理不同类型的消息
-            if (message.type === 'execution_start') {
-                console.log('开始执行工作流');
-            } else if (message.type === 'execution_cached') {
-                console.log('使用缓存结果');
-            } else if (message.type === 'executing') {
-                console.log('正在执行节点:', message.data.node);
-            } else if (message.type === 'progress') {
-                console.log('进度:', message.data.value);
-            } else if (message.type === 'executed') {
-                console.log('节点执行完成:', message.data.node);
-                if (message.data.output && message.data.output.images) {
-                    const imageUrl = `http://localhost:3001/api/view?filename=${message.data.output.images[0].filename}`;
-                    displayGeneratedResult({ image: imageUrl });
-                }
-            }
-        };
-
         // 修改下载函数
         async function downloadResult() {
             const resultImage = document.querySelector('.result-image');
@@ -1409,46 +1184,15 @@
             }
 
             try {
-                console.log('开始下载文件...');
-                
-                // 显示下载中的状态
-                const downloadBtn = document.querySelector('.next-btn');
-                const originalText = downloadBtn.textContent;
-                downloadBtn.textContent = '下载中...';
-                downloadBtn.disabled = true;
-
-                // 使用服务器作为代理来下载文件
-                const response = await fetch(`http://localhost:3003/api/download?url=${encodeURIComponent(resultImage.src)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/octet-stream'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`下载失败: ${response.status} ${response.statusText}`);
-                }
-
-                // 获取文件内容
+                // 直接从ComfyUI下载
+                const response = await fetch(resultImage.src);
                 const blob = await response.blob();
-                
-                // 从响应头获取文件名
-                const contentDisposition = response.headers.get('content-disposition');
-                let filename = '专属拜年图像.png';
-                if (contentDisposition) {
-                    const matches = contentDisposition.match(/filename\*=UTF-8''(.+)/i);
-                    if (matches && matches[1]) {
-                        filename = decodeURIComponent(matches[1]);
-                    }
-                }
-                
-                console.log('创建下载链接...');
                 
                 // 创建下载链接
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = filename;
+                link.download = '专属拜年图像.png';
                 
                 // 触发下载
                 document.body.appendChild(link);
@@ -1457,17 +1201,9 @@
                 // 清理
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
-                
-                console.log('下载完成');
-
             } catch (error) {
                 console.error('下载失败:', error);
-                alert('下载失败，请重试: ' + error.message);
-            } finally {
-                // 恢复按钮状态
-                const downloadBtn = document.querySelector('.next-btn');
-                downloadBtn.textContent = '保存图像';
-                downloadBtn.disabled = false;
+                alert('下载失败，请重试');
             }
         }
     </script>
