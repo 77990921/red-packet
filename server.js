@@ -14,7 +14,7 @@ app.use(express.static(__dirname));
 const upload = multer({ dest: 'uploads/' });
 
 // ComfyUI服务器地址
-const COMFY_API = 'http://127.0.0.1:6006';
+const COMFY_API = 'http://localhost:6006';
 
 // 工作流配置映射
 const workflowConfig = {
@@ -111,9 +111,18 @@ function updateSamplerSeeds(workflow) {
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
-        console.log('收到生成请求');
+        console.log('收到生成请求，请求体:', req.body);
+        console.log('上传的文件:', req.file);
         
-        // 1. 上传图片到ComfyUI
+        if (!req.file) {
+            throw new Error('未收到上传的图片');
+        }
+
+        // 验证文件是否存在
+        if (!fs.existsSync(req.file.path)) {
+            throw new Error('上传的文件不存在');
+        }
+
         const formData = new FormData();
         formData.append('image', fs.createReadStream(req.file.path));
         
@@ -121,8 +130,13 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         const uploadResponse = await fetch(`${COMFY_API}/upload/image`, {
             method: 'POST',
             body: formData
+        }).catch(error => {
+            console.error('上传请求失败:', error);
+            throw new Error('连接ComfyUI失败');
         });
 
+        console.log('上传响应状态:', uploadResponse.status);
+        
         if (!uploadResponse.ok) {
             throw new Error('图片上传到ComfyUI失败');
         }
@@ -167,7 +181,11 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('处理失败:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            error: error.message,
+            stack: error.stack,
+            details: '请检查服务器日志'
+        });
     } finally {
         // 清理临时文件
         if (req.file) {
@@ -218,7 +236,16 @@ app.get('/api/download', async (req, res) => {
     }
 });
 
-app.listen(3003, () => {
-    console.log('服务器运行在 http://localhost:3003');
+// 添加健康检查接口
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'ok',
+        comfyui: COMFY_API,
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.listen(3456, '0.0.0.0', () => {
+    console.log('服务器运行在 http://0.0.0.0:3456');
     console.log('ComfyUI地址:', COMFY_API);
 }); 

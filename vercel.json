@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:3003/api/:path*"
+      "destination": "http://connect.nmb1.seetacloud.com:3456/api/:path*"
     }
   ],
   "headers": [
@@ -11,8 +11,15 @@
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "POST,GET,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" },
+        { "key": "Access-Control-Max-Age", "value": "86400" }
       ]
     }
-  ]
+  ],
+  "probes": {
+    "api": {
+      "path": "/api/health",
+      "interval": 60
+    }
+  }
 } 
