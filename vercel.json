@@ -2,13 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:44854/api/:path*",
-      "has": [
-        {
-          "type": "header",
-          "key": "x-vercel-ip-country"
-        }
-      ]
+      "destination": "http://region-11.autodl.com:26040/api/:path*"
     }
   ],
   "headers": [

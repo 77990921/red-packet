@@ -139,6 +139,18 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         console.log('收到生成请求，请求体:', req.body);
         console.log('上传的文件:', req.file);
         
+        // 检查ComfyUI是否可访问
+        try {
+            const comfyResponse = await fetch(`${COMFY_API}/history`);
+            console.log('ComfyUI状态:', comfyResponse.status);
+            if (!comfyResponse.ok) {
+                throw new Error(`ComfyUI服务未正确响应: ${comfyResponse.status}`);
+            }
+        } catch (error) {
+            console.error('ComfyUI连接失败:', error);
+            throw new Error('无法连接到ComfyUI服务');
+        }
+
         const workflowName = req.body.workflow;
         console.log('使用工作流:', workflowName);
         
@@ -147,14 +159,6 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         console.log('工作流路径:', workflowPath);
         console.log('工作流文件是否存在:', fs.existsSync(workflowPath));
         
-        // 检查ComfyUI是否可访问
-        try {
-            const comfyResponse = await fetch(`${COMFY_API}/history`);
-            console.log('ComfyUI状态:', comfyResponse.status);
-        } catch (error) {
-            console.error('ComfyUI连接失败:', error);
-        }
-
         const config = workflowConfig[workflowName];
         
         if (!config) {
@@ -220,7 +224,8 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         res.status(500).json({ 
             error: error.message,
             stack: error.stack,
-            details: '请检查服务器日志'
+            details: '请检查服务器日志',
+            comfy_status: await checkComfyStatus()  // 添加ComfyUI状态检查
         });
     } finally {
         // 清理临时文件
@@ -231,6 +236,21 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         }
     }
 });
+
+// 添加ComfyUI状态检查函数
+async function checkComfyStatus() {
+    try {
+        const response = await fetch(`${COMFY_API}/history`);
+        return {
+            status: response.status,
+            ok: response.ok
+        };
+    } catch (error) {
+        return {
+            error: error.message
+        };
+    }
+}
 
 app.get('/api/view', async (req, res) => {
     try {
@@ -300,7 +320,7 @@ app.get('/api/download', async (req, res) => {
     }
 });
 
-app.listen(44854, '0.0.0.0', () => {
-    console.log('服务器运行在 http://0.0.0.0:44854');
+app.listen(6006, '0.0.0.0', () => {
+    console.log('服务器运行在 http://0.0.0.0:6006');
     console.log('ComfyUI地址:', COMFY_API);
 }); 
