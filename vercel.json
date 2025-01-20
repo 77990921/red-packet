@@ -1,12 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:6006/api/:path*"
-    },
-    {
-      "source": "/comfyui/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:6006/comfyui/:path*"
+      "source": "/(.*)",
+      "destination": "http://connect.nmb1.seetacloud.com:6006/$1"
     }
   ],
   "headers": [
