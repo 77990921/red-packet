@@ -232,6 +232,34 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
     }
 });
 
+app.get('/api/view', async (req, res) => {
+    try {
+        const { filename, type, subfolder } = req.query;
+        const fileUrl = `${COMFY_API}/view?filename=${encodeURIComponent(filename)}&type=${type}&subfolder=${encodeURIComponent(subfolder || '')}`;
+
+        // 从ComfyUI获取文件
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            throw new Error('文件获取失败');
+        }
+
+        // 获取文件内容和类型
+        const contentType = response.headers.get('content-type') || 'application/octet-stream';
+        const buffer = await response.buffer();
+
+        // 设置响应头
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        
+        // 发送文件
+        res.send(buffer);
+
+    } catch (error) {
+        console.error('获取文件失败:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get('/api/download', async (req, res) => {
     try {
         const fileUrl = req.query.url;
