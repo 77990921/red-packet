@@ -235,7 +235,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-app.listen(3456, '0.0.0.0', () => {
-    console.log('服务器运行在 http://0.0.0.0:3456');
+app.listen(44854, '0.0.0.0', () => {
+    console.log('服务器运行在 http://0.0.0.0:44854');
     console.log('ComfyUI地址:', COMFY_API);
 }); 
