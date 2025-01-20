@@ -932,7 +932,13 @@
         // 修改 API 基础地址配置
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:6006' 
-            : 'http://connect.nmb1.seetacloud.com:44854';  // 使用您的AUTODL域名和端口
+            : '/api';  // 使用Vercel代理
+
+        // 修改工作流配置
+        const config = {
+            inputNode: '21',    // 确认这个ID与您的工作流匹配
+            outputNode: '94'    // 确认这个ID与您的工作流匹配
+        };
 
         // 更新步骤显示
         function updateSteps(step) {
@@ -1017,7 +1023,8 @@
                 nextBtn.disabled = true;
 
                 try {
-                    // 直接上传到ComfyUI
+                    // 添加更多日志输出
+                    console.log('开始上传图片...');
                     const formData = new FormData();
                     formData.append('image', uploadedImage);
                     
@@ -1026,6 +1033,8 @@
                         body: formData
                     });
 
+                    console.log('上传响应:', await uploadResponse.clone().text());
+                    
                     if (!uploadResponse.ok) {
                         throw new Error('图片上传失败');
                     }
@@ -1097,7 +1106,7 @@
                 }
 
             } catch (error) {
-                console.error('生成失败:', error);
+                console.error('详细错误:', error);
                 alert('生成失败: ' + (error.message || '请检查网络连接'));
                 
                 // 恢复显示状态
