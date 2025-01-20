@@ -1027,19 +1027,30 @@
                     const formData = new FormData();
                     formData.append('image', uploadedImage);
                     
+                    // 先尝试预检请求
+                    try {
+                        const preflightResponse = await fetch(`${API_BASE_URL}/upload/image`, {
+                            method: 'OPTIONS',
+                            headers: {
+                                'Access-Control-Request-Method': 'POST',
+                                'Access-Control-Request-Headers': 'content-type'
+                            }
+                        });
+                        
+                        console.log('预检响应:', preflightResponse.status);
+                    } catch (error) {
+                        console.log('预检请求失败，继续尝试上传');
+                    }
+
+                    // 执行上传
                     const uploadResponse = await fetch(`${API_BASE_URL}/upload/image`, {
                         method: 'POST',
                         body: formData,
+                        mode: 'cors',
                         headers: {
                             'Accept': '*/*'
                         }
-                    }).catch(error => {
-                        console.error('网络错误:', error);
-                        throw new Error(`网络连接失败，请稍后重试`);
                     });
-
-                    console.log('上传状态:', uploadResponse.status);
-                    console.log('上传响应头:', Object.fromEntries(uploadResponse.headers.entries()));
 
                     if (!uploadResponse.ok) {
                         const errorText = await uploadResponse.text();
@@ -1047,7 +1058,6 @@
                         throw new Error('图片上传失败，请重试');
                     }
 
-                    // 只读取一次响应内容
                     const uploadResult = await uploadResponse.json();
                     console.log('上传成功:', uploadResult);
 
