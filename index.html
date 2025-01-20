@@ -929,8 +929,10 @@
         let selectedStyle = null;
         let selectedBackground = null;
 
-        // 根据环境设置API地址
-        const API_BASE_URL = 'http://connect.nmb1.seetacloud.com:6006';  // 直接使用ComfyUI的地址
+        // 修改 API 基础地址配置
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:6006' 
+            : 'http://connect.nmb1.seetacloud.com:44854';  // 使用您的AUTODL域名和端口
 
         // 更新步骤显示
         function updateSteps(step) {
@@ -1003,11 +1005,6 @@
                     throw new Error('未找到对应的工作流配置');
                 }
 
-                // 创建 FormData 对象
-                const formData = new FormData();
-                formData.append('image', uploadedImage);
-                formData.append('workflow', workflow);
-
                 // 显示加载状态和禁用按钮
                 const loadingElement = document.querySelector('.loading');
                 const resultWrapper = document.querySelector('.result-wrapper');
@@ -1019,9 +1016,11 @@
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
 
-                // 上传图片并执行工作流
                 try {
-                    // 上传图片
+                    // 直接上传到ComfyUI
+                    const formData = new FormData();
+                    formData.append('image', uploadedImage);
+                    
                     const uploadResponse = await fetch(`${API_BASE_URL}/upload/image`, {
                         method: 'POST',
                         body: formData
@@ -1033,6 +1032,13 @@
 
                     const uploadResult = await uploadResponse.json();
                     
+                    // 加载工作流文件
+                    const workflowResponse = await fetch(workflow);
+                    const workflowData = await workflowResponse.json();
+                    
+                    // 更新工作流中的图片输入
+                    workflowData[config.inputNode].inputs.image = uploadResult.name;
+
                     // 发送工作流请求
                     const promptResponse = await fetch(`${API_BASE_URL}/prompt`, {
                         method: 'POST',
@@ -1040,7 +1046,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            prompt: workflow
+                            prompt: workflowData
                         })
                     });
 
@@ -1059,16 +1065,21 @@
                         const history = await historyResponse.json();
                         
                         if (history[promptResult.prompt_id]?.outputs) {
-                            const output = history[promptResult.prompt_id].outputs;
-                            const outputUrl = `${API_BASE_URL}/view?filename=${output.filename}&type=output&subfolder=${output.subfolder || ''}`;
+                            const outputs = history[promptResult.prompt_id].outputs;
+                            const outputNode = config.outputNode;
                             
-                            // 显示结果
-                            const resultImage = document.querySelector('.result-image');
-                            resultImage.src = outputUrl;
-                            
-                            loadingElement.style.display = 'none';
-                            resultWrapper.style.display = 'flex';
-                            break;
+                            if (outputs[outputNode]) {
+                                const output = outputs[outputNode];
+                                const outputUrl = `${API_BASE_URL}/view?filename=${output.images[0].filename}&type=output&subfolder=${output.images[0].subfolder || ''}`;
+                                
+                                // 显示结果
+                                const resultImage = document.querySelector('.result-image');
+                                resultImage.src = outputUrl;
+                                
+                                loadingElement.style.display = 'none';
+                                resultWrapper.style.display = 'flex';
+                                break;
+                            }
                         }
                         
                         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1087,7 +1098,7 @@
 
             } catch (error) {
                 console.error('生成失败:', error);
-                alert('生成失败，请重试: ' + error.message);
+                alert('生成失败: ' + (error.message || '请检查网络连接'));
                 
                 // 恢复显示状态
                 const loadingElement = document.querySelector('.loading');
