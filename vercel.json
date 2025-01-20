@@ -16,11 +16,5 @@
       ]
     }
   ],
-  "regions": ["sfo1"],
-  "functions": {
-    "api/**": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  }
+  "regions": ["sfo1"]
 } 
