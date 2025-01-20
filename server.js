@@ -8,6 +8,9 @@ const path = require('path');
 
 const app = express();
 
+// 先定义ComfyUI服务器地址
+const COMFY_API = 'http://127.0.0.1:6006';
+
 // 修改CORS配置
 app.use(cors({
     origin: '*',
@@ -18,13 +21,13 @@ app.use(cors({
 // 添加OPTIONS请求处理
 app.options('*', cors());
 
-// 添加健康检查接口 - 移到这里
+// 修改健康检查接口
 app.get('/api/health', (req, res) => {
     try {
         res.json({ 
             status: 'ok',
-            comfyui: COMFY_API,
-            timestamp: new Date().toISOString(),
+            comfyui_url: COMFY_API,
+            server_time: new Date().toISOString(),
             message: '服务正常运行'
         });
     } catch (error) {
@@ -39,9 +42,6 @@ app.use(express.static(__dirname));
 
 // 配置文件上传
 const upload = multer({ dest: 'uploads/' });
-
-// ComfyUI服务器地址
-const COMFY_API = 'http://127.0.0.1:6006';
 
 // 工作流配置映射
 const workflowConfig = {
@@ -149,6 +149,19 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         const workflowName = req.body.workflow;
         console.log('使用工作流:', workflowName);
         
+        // 检查工作流文件是否存在
+        const workflowPath = path.join(__dirname, workflowName);
+        console.log('工作流路径:', workflowPath);
+        console.log('工作流文件是否存在:', fs.existsSync(workflowPath));
+        
+        // 检查ComfyUI是否可访问
+        try {
+            const comfyResponse = await fetch(`${COMFY_API}/history`);
+            console.log('ComfyUI状态:', comfyResponse.status);
+        } catch (error) {
+            console.error('ComfyUI连接失败:', error);
+        }
+
         const config = workflowConfig[workflowName];
         
         if (!config) {
@@ -172,7 +185,6 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         console.log('图片上传成功:', uploadResult);
 
         // 2. 加载工作流
-        const workflowPath = path.join(__dirname, workflowName);
         let workflow;
         try {
             workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
