@@ -1017,16 +1017,16 @@
                 formData.append('image', uploadedImage);
                 formData.append('workflow', workflowMap[selectedStyle][selectedBackground]);
 
-                // 直接发送生成请求
-                const response = await fetch(`${API_BASE_URL}/generate`, {
+                console.log('开始生成，使用工作流:', workflowMap[selectedStyle][selectedBackground]);
+
+                // 发送到服务器
+                const response = await fetch('/api/generate', {
                     method: 'POST',
                     body: formData
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('生成失败:', errorText);
-                    throw new Error('生成失败，请重试');
+                    throw new Error('生成请求失败');
                 }
 
                 const result = await response.json();
@@ -1044,9 +1044,9 @@
                 resultWrapper.style.display = 'flex';
 
             } catch (error) {
-                console.error('详细错误:', error);
-                alert(error.message || '生成失败，请重试');
+                console.error('生成失败:', error);
                 loadingElement.style.display = 'none';
+                alert('生成失败: ' + error.message);
             }
         }
 
@@ -1139,7 +1139,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/download?url=${encodeURIComponent(resultImage.src)}`);
+                const response = await fetch(`/api/download?url=${encodeURIComponent(resultImage.src)}`);
                 
                 if (!response.ok) {
                     throw new Error('下载失败');
