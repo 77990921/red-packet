@@ -43,8 +43,9 @@ app.use(express.static(__dirname));
 const workflowConfig = {
     'shanzi_gif_api.json': {
         inputNode: '21',    // LoadImage节点
-        outputNode: '97',   // 修改为正确的SaveImage节点ID
-        outputType: 'images'
+        outputNode: '97',   // SaveImage节点
+        outputType: 'images',
+        preset: 'STANDARD (medium strength)'  // 改用标准预设，不需要人脸检测
     },
     'snake_anime_api.json': {
         inputNode: '21',    // LoadImage节点
