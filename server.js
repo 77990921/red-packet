@@ -143,33 +143,26 @@ function updateSamplerSeeds(workflow) {
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
+        console.log('开始处理生成请求');
+        console.log('COMFY_API 地址:', COMFY_API);
+
         if (!req.file) {
             throw new Error('未上传图片');
         }
 
-        // 准备图片数据
-        const formData = new FormData();
-        if (process.env.VERCEL) {
-            // 在 Vercel 环境中使用内存中的文件数据
-            formData.append('image', req.file.buffer, {
-                filename: req.file.originalname,
-                contentType: req.file.mimetype
-            });
-        } else {
-            // 在本地环境中使用文件系统
-            formData.append('image', fs.createReadStream(req.file.path));
-        }
-
         // 检查ComfyUI是否可访问
         try {
+            console.log('尝试连接 ComfyUI...');
             const comfyResponse = await fetch(`${COMFY_API}/history`);
-            console.log('ComfyUI状态:', comfyResponse.status);
+            console.log('ComfyUI响应状态:', comfyResponse.status);
+            console.log('ComfyUI响应内容:', await comfyResponse.text());
+            
             if (!comfyResponse.ok) {
                 throw new Error(`ComfyUI服务未正确响应: ${comfyResponse.status}`);
             }
         } catch (error) {
-            console.error('ComfyUI连接失败:', error);
-            throw new Error('无法连接到ComfyUI服务');
+            console.error('ComfyUI连接详细错误:', error);
+            throw new Error(`无法连接到ComfyUI服务: ${error.message}`);
         }
 
         const workflowName = req.body.workflow;
@@ -187,6 +180,18 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         }
 
         // 1. 上传图片
+        const formData = new FormData();
+        if (process.env.VERCEL) {
+            // 在 Vercel 环境中使用内存中的文件数据
+            formData.append('image', req.file.buffer, {
+                filename: req.file.originalname,
+                contentType: req.file.mimetype
+            });
+        } else {
+            // 在本地环境中使用文件系统
+            formData.append('image', fs.createReadStream(req.file.path));
+        }
+
         const uploadResponse = await fetch(`${COMFY_API}/upload/image`, {
             method: 'POST',
             body: formData
@@ -237,10 +242,12 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         res.json(result);
 
     } catch (error) {
-        console.error('处理失败:', error);
+        console.error('处理失败详细信息:', error);
+        console.error('错误堆栈:', error.stack);
         res.status(500).json({
             error: '生成失败',
-            details: error.message
+            details: error.message,
+            stack: error.stack
         });
     } finally {
         // 只在本地环境清理文件
@@ -267,6 +274,7 @@ async function checkComfyStatus() {
     }
 }
 
+// 添加 /api/view 路由 - 放在 /api/download 路由之前
 app.get('/api/view', async (req, res) => {
     try {
         const { filename, type, subfolder } = req.query;
