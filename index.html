@@ -1043,8 +1043,11 @@
 
             } catch (error) {
                 console.error('生成失败:', error);
-                loadingElement.style.display = 'none';
-                alert(error.message || '生成失败，请重试');
+                // 显示更详细的错误信息
+                const errorMessage = error.response ? 
+                    `${error.message} (${error.response.status}: ${error.response.statusText})` : 
+                    error.message;
+                throw new Error(`生成失败: ${errorMessage}`);
             }
         }
 

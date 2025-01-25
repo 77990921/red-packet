@@ -233,12 +233,11 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('处理失败:', error);
-        console.error('错误堆栈:', error.stack);
-        res.status(500).json({ 
-            error: error.message,
-            stack: error.stack,
-            details: '请检查服务器日志',
-            comfy_status: await checkComfyStatus()  // 添加ComfyUI状态检查
+        // 返回更详细的错误信息
+        res.status(500).json({
+            error: '生成失败',
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     } finally {
         // 清理临时文件
@@ -331,6 +330,16 @@ app.get('/api/download', async (req, res) => {
         console.error('下载失败:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// 添加错误处理中间件
+app.use((err, req, res, next) => {
+    console.error('服务器错误:', err);
+    res.status(500).json({
+        error: '服务器错误',
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
 });
 
 app.listen(8188, '0.0.0.0', () => {  // Node.js使用8188端口
