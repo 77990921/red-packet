@@ -8,7 +8,7 @@ const path = require('path');
 
 // 修改ComfyUI服务器地址
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://127.0.0.1:7000'  // 通过7000端口的代理服务访问
+    ? 'http://127.0.0.1:6006/v2'  // 通过代理访问ComfyUI，使用v2前缀
     : 'http://127.0.0.1:6006';
 
 const app = express();
