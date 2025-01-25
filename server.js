@@ -169,9 +169,10 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         console.log('使用工作流:', workflowName);
         
         // 检查工作流文件是否存在
-        const workflowPath = path.join(__dirname, workflowName);
-        console.log('工作流路径:', workflowPath);
-        console.log('工作流文件是否存在:', fs.existsSync(workflowPath));
+        const workflowPath = path.join(process.cwd(), workflowName);
+        console.log('当前目录:', process.cwd());
+        console.log('尝试读取工作流:', workflowPath);
+        console.log('目录内容:', fs.readdirSync(process.cwd()));
         
         const config = workflowConfig[workflowName];
         
@@ -208,8 +209,11 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         let workflow;
         try {
             workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
+            console.log('工作流读取成功');
         } catch (error) {
-            throw new Error(`工作流文件读取失败: ${workflowName}`);
+            console.error('工作流读取错误:', error);
+            console.error('错误堆栈:', error.stack);
+            throw new Error(`工作流文件读取失败: ${workflowName} (${error.message})`);
         }
 
         // 3. 更新工作流中的图片节点
