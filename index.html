@@ -932,7 +932,7 @@
         // 修改 API 基础地址配置
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8188'
-            : '';  // 在生产环境中使用相对路径
+            : '/api';  // 改回使用 /api 前缀
 
         // 修改工作流配置
         const config = {

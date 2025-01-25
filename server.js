@@ -36,13 +36,8 @@ if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
 
-// 修改静态文件服务配置
-app.use(express.static(path.join(__dirname, 'public')));
-
-// 添加通配符路由来处理所有其他请求
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// 静态文件服务 - 恢复原来的配置
+app.use(express.static(__dirname));
 
 // 工作流配置映射
 const workflowConfig = {
