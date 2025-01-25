@@ -43,7 +43,7 @@ app.use(express.static(__dirname));
 const workflowConfig = {
     'shanzi_gif_api.json': {
         inputNode: '21',    // LoadImage节点
-        outputNode: '94',   // SaveImage节点
+        outputNode: '97',   // 修改为正确的SaveImage节点ID
         outputType: 'images'
     },
     'snake_anime_api.json': {
@@ -76,22 +76,28 @@ const workflowConfig = {
 // 等待工作流执行完成的函数
 async function waitForResult(promptId, config) {
     let retryCount = 0;
-    const maxRetries = 300; // 5分钟
-
+    const maxRetries = 300; // 5分钟超时
+    
     while (retryCount < maxRetries) {
         try {
+            console.log(`[${retryCount}] 检查工作流状态: ${promptId}`);
             const historyResponse = await fetch(`${COMFY_API}/history/${promptId}`);
             const history = await historyResponse.json();
+            
+            console.log('工作流历史:', JSON.stringify(history, null, 2));
             
             if (history[promptId] && history[promptId].outputs) {
                 const outputs = history[promptId].outputs;
                 const outputNode = config.outputNode;
                 
+                console.log('找到输出节点:', outputNode);
+                console.log('输出内容:', outputs);
+                
                 if (outputs[outputNode]) {
                     const output = outputs[outputNode];
                     if (output[config.outputType] && output[config.outputType].length > 0) {
                         const file = output[config.outputType][0];
-                        console.log(`找到输出文件:`, file);
+                        console.log('找到输出文件:', file);
                         return {
                             output_url: process.env.NODE_ENV === 'production'
                                 ? `/api/view?filename=${encodeURIComponent(file.filename)}&type=output&subfolder=${encodeURIComponent(file.subfolder || '')}`
@@ -101,7 +107,14 @@ async function waitForResult(promptId, config) {
                 }
             }
             
+            // 检查工作流状态
+            if (history[promptId] && history[promptId].status) {
+                console.log('工作流状态:', history[promptId].status);
+            }
+            
+            // 检查错误
             if (history[promptId] && history[promptId].error) {
+                console.error('工作流错误:', history[promptId].error);
                 throw new Error(`工作流执行错误: ${history[promptId].error}`);
             }
             
