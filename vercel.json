@@ -28,3 +28,8 @@
     "COMFY_API": "http://127.0.0.1:6006"
   }
 } 
+  "env": {
+    "NODE_ENV": "production",
+    "COMFY_API": "http://127.0.0.1:6006"
+  }
+} 
