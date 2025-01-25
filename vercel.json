@@ -9,24 +9,13 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
-      }
+      "dest": "server.js"
     },
     {
       "src": "/(.*)",
       "dest": "/$1"
     }
   ],
-  "functions": {
-    "api/*": {
-      "memory": 3008,
-      "maxDuration": 300
-    }
-  },
   "env": {
     "NODE_ENV": "production",
     "COMFY_API": "http://127.0.0.1:6006"
