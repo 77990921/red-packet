@@ -6,9 +6,9 @@ const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 
-// 修改ComfyUI服务器地址
+// 修改回6006端口
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://127.0.0.1:6006'  // 直接访问ComfyUI
+    ? 'http://127.0.0.1:6006'  // 改回ComfyUI的原始端口
     : 'http://127.0.0.1:6006';
 
 const app = express();
