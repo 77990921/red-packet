@@ -6,19 +6,37 @@ const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 
-// 修改回6006端口
-const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? process.env.COMFY_API || 'http://127.0.0.1:6006'  // 使用环境变量
-    : 'http://127.0.0.1:6006';
+// 修改 COMFY_API 配置，确保在 Vercel 环境中正确工作
+const COMFY_API = process.env.COMFY_API || 'http://127.0.0.1:6006';
 
 const app = express();
 
-// 基础中间件配置 - 必须在所有路由之前
+// 基础中间件配置
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// 健康检查接口 - 必须在基础中间件之后，其他路由之前
+// 在 Vercel 环境中使用内存存储而不是文件系统
+const storage = process.env.VERCEL 
+    ? multer.memoryStorage()
+    : multer.diskStorage({
+        destination: 'uploads/',
+        filename: (req, file, cb) => {
+            cb(null, file.originalname);
+        }
+    });
+
+const upload = multer({ storage });
+
+// 只在本地环境创建 uploads 目录
+if (!process.env.VERCEL && !fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// 静态文件服务
+app.use(express.static(__dirname));
+
+// 健康检查接口
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
@@ -27,17 +45,6 @@ app.get('/api/health', (req, res) => {
         message: '服务正常运行'
     });
 });
-
-// 配置文件上传
-const upload = multer({ dest: 'uploads/' });
-
-// 确保uploads目录存在
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
-
-// 改为单一的静态文件服务配置
-app.use(express.static(__dirname));
 
 // 工作流配置映射
 const workflowConfig = {
@@ -149,9 +156,23 @@ function updateSamplerSeeds(workflow) {
 
 app.post('/api/generate', upload.single('image'), async (req, res) => {
     try {
-        console.log('收到生成请求，请求体:', req.body);
-        console.log('上传的文件:', req.file);
-        
+        if (!req.file) {
+            throw new Error('未上传图片');
+        }
+
+        // 准备图片数据
+        const formData = new FormData();
+        if (process.env.VERCEL) {
+            // 在 Vercel 环境中使用内存中的文件数据
+            formData.append('image', req.file.buffer, {
+                filename: req.file.originalname,
+                contentType: req.file.mimetype
+            });
+        } else {
+            // 在本地环境中使用文件系统
+            formData.append('image', fs.createReadStream(req.file.path));
+        }
+
         // 检查ComfyUI是否可访问
         try {
             const comfyResponse = await fetch(`${COMFY_API}/history`);
@@ -179,9 +200,6 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
         }
 
         // 1. 上传图片
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream(req.file.path));
-        
         const uploadResponse = await fetch(`${COMFY_API}/upload/image`, {
             method: 'POST',
             body: formData
@@ -233,15 +251,13 @@ app.post('/api/generate', upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('处理失败:', error);
-        // 返回更详细的错误信息
         res.status(500).json({
             error: '生成失败',
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            details: error.message
         });
     } finally {
-        // 清理临时文件
-        if (req.file) {
+        // 只在本地环境清理文件
+        if (!process.env.VERCEL && req.file) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error('清理临时文件失败:', err);
             });
@@ -345,4 +361,7 @@ app.use((err, req, res, next) => {
 app.listen(8188, '0.0.0.0', () => {  // Node.js使用8188端口
     console.log('服务器运行在 http://0.0.0.0:8188');
     console.log('ComfyUI地址:', COMFY_API);
-}); 
+});
+
+// 导出 app 以供 Vercel 使用
+module.exports = app; 
