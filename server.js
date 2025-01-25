@@ -44,8 +44,7 @@ const workflowConfig = {
     'shanzi_gif_api.json': {
         inputNode: '21',    // LoadImage节点
         outputNode: '97',   // SaveImage节点
-        outputType: 'images',
-        preset: 'STANDARD (medium strength)'  // 改用标准预设，不需要人脸检测
+        outputType: 'images'
     },
     'snake_anime_api.json': {
         inputNode: '21',    // LoadImage节点
@@ -54,7 +53,7 @@ const workflowConfig = {
     },
     'snake_photo_api.json': {
         inputNode: '27',    // LoadImage节点
-        outputNode: '120',   // SaveImage节点
+        outputNode: '120',  // SaveImage节点
         outputType: 'images'
     },
     'food_anime_api.json': {
