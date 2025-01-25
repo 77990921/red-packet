@@ -361,6 +361,41 @@ app.get('/api/test-comfy', async (req, res) => {
     }
 });
 
+// 添加诊断路由
+app.get('/api/diagnose', async (req, res) => {
+    try {
+        console.log('开始诊断...');
+        console.log('COMFY_API:', COMFY_API);
+        
+        // 测试 ComfyUI 连接
+        const testResult = {
+            comfy_api: COMFY_API,
+            tests: {}
+        };
+
+        try {
+            const historyResponse = await fetch(`${COMFY_API}/history`);
+            testResult.tests.history = {
+                status: historyResponse.status,
+                ok: historyResponse.ok
+            };
+        } catch (error) {
+            testResult.tests.history = {
+                error: error.message
+            };
+        }
+
+        // 返回诊断结果
+        res.json(testResult);
+        
+    } catch (error) {
+        res.status(500).json({
+            error: error.message,
+            stack: error.stack
+        });
+    }
+});
+
 // 添加错误处理中间件
 app.use((err, req, res, next) => {
     console.error('服务器错误:', err);
