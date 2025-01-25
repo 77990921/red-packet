@@ -335,6 +335,24 @@ app.get('/api/download', async (req, res) => {
     }
 });
 
+// 添加测试路由来获取 ComfyUI 地址
+app.get('/api/test-comfy', async (req, res) => {
+    try {
+        const response = await fetch(`${COMFY_API}/history`);
+        const data = await response.json();
+        res.json({
+            comfy_url: COMFY_API,
+            status: response.status,
+            data: data
+        });
+    } catch (error) {
+        res.json({
+            error: error.message,
+            comfy_url: COMFY_API
+        });
+    }
+});
+
 // 添加错误处理中间件
 app.use((err, req, res, next) => {
     console.error('服务器错误:', err);
