@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://connect.nmb1.seetacloud.com:6006/v1/api/:path*"
+      "destination": "http://connect.nmb1.seetacloud.com:6006/api/:path*"
     }
   ],
   "headers": [
