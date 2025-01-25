@@ -36,8 +36,18 @@ if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
 
-// 静态文件服务 - 恢复原来的配置
-app.use(express.static(__dirname));
+// 静态文件服务配置
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/', express.static(__dirname));
+
+// 添加一个通配符路由来处理其他所有请求
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+        res.status(404).send('API not found');
+    } else {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }
+});
 
 // 工作流配置映射
 const workflowConfig = {

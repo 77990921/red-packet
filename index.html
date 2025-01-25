@@ -1018,7 +1018,7 @@
                 formData.append('workflow', workflowMap[selectedStyle][selectedBackground]);
 
                 // 发送生成请求
-                const response = await fetch(`${API_BASE_URL}/api/generate`, {
+                const response = await fetch('/api/generate', {
                     method: 'POST',
                     body: formData
                 });
@@ -1140,7 +1140,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/download?url=${encodeURIComponent(resultImage.src)}`);
+                const response = await fetch(`/api/download?url=${encodeURIComponent(resultImage.src)}`);
                 
                 if (!response.ok) {
                     throw new Error('下载失败');
