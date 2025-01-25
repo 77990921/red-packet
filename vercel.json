@@ -13,11 +13,10 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "index.html"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "COMFY_API": "http://127.0.0.1:6006"
+    "NODE_ENV": "production"
   }
 } 

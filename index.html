@@ -931,8 +931,8 @@
 
         // 修改 API 基础地址配置
         const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8188'  // 修改为Node.js服务器的端口
-            : '/api';  // 使用Vercel代理
+            ? 'http://localhost:8188'
+            : '';  // 在生产环境中使用相对路径
 
         // 修改工作流配置
         const config = {
@@ -1018,7 +1018,7 @@
                 formData.append('workflow', workflowMap[selectedStyle][selectedBackground]);
 
                 // 发送生成请求
-                const response = await fetch('/api/generate', {
+                const response = await fetch(`${API_BASE_URL}/api/generate`, {
                     method: 'POST',
                     body: formData
                 });
@@ -1140,7 +1140,7 @@
             }
 
             try {
-                const response = await fetch(`/api/download?url=${encodeURIComponent(resultImage.src)}`);
+                const response = await fetch(`${API_BASE_URL}/api/download?url=${encodeURIComponent(resultImage.src)}`);
                 
                 if (!response.ok) {
                     throw new Error('下载失败');

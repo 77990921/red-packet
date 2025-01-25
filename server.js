@@ -8,7 +8,7 @@ const path = require('path');
 
 // 修改回6006端口
 const COMFY_API = process.env.NODE_ENV === 'production' 
-    ? 'http://127.0.0.1:6006'  // 改回ComfyUI的原始端口
+    ? process.env.COMFY_API || 'http://127.0.0.1:6006'  // 使用环境变量
     : 'http://127.0.0.1:6006';
 
 const app = express();
@@ -36,8 +36,13 @@ if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
 
-// 静态文件服务
-app.use(express.static(__dirname));
+// 修改静态文件服务配置
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 添加通配符路由来处理所有其他请求
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // 工作流配置映射
 const workflowConfig = {
