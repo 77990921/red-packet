@@ -8,17 +8,21 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "/server.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
       }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ],
   "functions": {
-    "server.js": {
+    "api/*": {
       "memory": 3008,
       "maxDuration": 300
     }
